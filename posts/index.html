@@ -97,6 +97,24 @@
   <div class="bg-white mb3 pa4 gray overflow-hidden">
     <span class="f6 db">Posts</span>
     <h1 class="f3 near-black">
+      <a href="/posts/condition-variable/" class="link black dim">
+        Condition Variable
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      条件变量 type Cond func NeWCond(l Locker) *Cond func (c *Cond) Broadcast() func (c *Cond) Signal() func (c *Cond) Wait() ready := false c := sync.NewCond(&amp;sync.Mutex{}) func condition() bool { return ready } func consume() { for { c.L.Lock() for !condtion() { // A: c.Wait() // B } // consumming... c.L.Unlock() } } func produce1() { // producing... c.L.Lock() ready = true // C c.signal() // D：在临界区内signal c.L.Unlock() } func produce2() { // producing.
+    </div>
+    <a href="/posts/condition-variable/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+        <div class="relative w-100 w-30-l mb4 bg-white">
+          <div class="relative w-100 mb4 bg-white nested-copy-line-height">
+  <div class="bg-white mb3 pa4 gray overflow-hidden">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
       <a href="/posts/my-first-post/" class="link black dim">
         My First Post
       </a>

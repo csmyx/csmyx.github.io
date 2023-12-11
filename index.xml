@@ -6,8 +6,15 @@
     <description>Recent content on 我的博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 11 Dec 2023 14:15:03 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 11 Dec 2023 14:34:35 +0800</lastBuildDate>
     <atom:link href="https://csmyx.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Condition Variable</title>
+      <link>https://csmyx.github.io/posts/condition-variable/</link>
+      <pubDate>Mon, 11 Dec 2023 14:34:35 +0800</pubDate>
+      <guid>https://csmyx.github.io/posts/condition-variable/</guid>
+      <description>条件变量 type Cond func NeWCond(l Locker) *Cond func (c *Cond) Broadcast() func (c *Cond) Signal() func (c *Cond) Wait() ready := false c := sync.NewCond(&amp;amp;sync.Mutex{}) func condition() bool { return ready } func consume() { for { c.L.Lock() for !condtion() { // A: c.Wait() // B } // consumming... c.L.Unlock() } } func produce1() { // producing... c.L.Lock() ready = true // C c.signal() // D：在临界区内signal c.L.Unlock() } func produce2() { // producing.</description>
+    </item>
     <item>
       <title>My First Post</title>
       <link>https://csmyx.github.io/posts/my-first-post/</link>
