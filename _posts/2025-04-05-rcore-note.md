@@ -1,3 +1,9 @@
+---
+layout: mypost
+title: rcore 学习笔记
+categories: [rcore]
+---
+
 ## chapter 1
 
 ### remove std-lib dependency
