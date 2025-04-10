@@ -1,8 +1,7 @@
 ---
 author: 'csmyx'
 date: '2025-04-10T18:16:54+08:00'
-title: 'RCore Camp Guide 2025S 学习笔记1'
-description: 'RCore Camp Guide 2025S 学习笔记1'
+title: 'rCore Camp Guide 2025S 学习笔记1'
 summary: 'RCore Camp Guide 2025S 学习笔记1'
 # tags: ["Rust", "OS"]
 # categories: ["Rust", "OS"]
@@ -158,11 +157,11 @@ lab:
 
   最低一级页表的RWXU标志位是根据逻辑段MapArea的map permission来设置，**因此用户可访问权限的逻辑段的初始化，一定要赋予该U权限。**
 
-  <img src="C:\Users\15023\AppData\Roaming\Typora\typora-user-images\image-20250408200417859.png" alt="image-20250408200417859" style="zoom:50%;" />
+  <img src="/img/1.png" alt="load failed" style="zoom:50%;" />
 
   与该标志位设置相关的bugfix：
 
-  <img src="C:\Users\15023\AppData\Roaming\Typora\typora-user-images\image-20250408201914203.png" alt="image-20250408201914203" style="zoom:50%;" />
+  <img src="/img/2.png" alt="load failed" style="zoom:50%;" />
 
-  <img src="C:\Users\15023\AppData\Roaming\Typora\typora-user-images\image-20250408202012929.png" alt="image-20250408202012929" style="zoom:50%;" />
+  <img src="/img/3.png" alt="load failed" style="zoom:50%;" />
 
