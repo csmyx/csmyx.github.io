@@ -8,10 +8,17 @@ summary: 'RCore Camp Guide 2025S 学习笔记1'
 series: ["rCore-Camp-Guide-2025S"]
 disableShare: true
 ---
+## Chapter 1
+### todo
+## Chapter 2
+### todo
+## Chapter 3
+### todo
+## Chapter 4
 
 ### 陷入trap
 
-```assembly
+```asm
 __alltraps:
     csrrw sp, sscratch, sp
     # now sp->*TrapContext in user space, sscratch->user stack
@@ -80,7 +87,7 @@ __alltraps:
 
 ### trap返回
 
-```assembly
+```asm
 __restore:
     # a0: *TrapContext in user space(Constant); a1: user space token
     # switch to user space
@@ -119,7 +126,7 @@ __restore:
    2. 处于用户地址空间
    3. 已经根据trap context重置了寄存器状态
 
-#### questions
+### questions
 
 1. 假设存在N个app，此时有几个页表？有几个虚拟页同时映射到trampoline这个物理页？
 
@@ -143,7 +150,7 @@ __restore:
 
    kernel_stap, kernel_sp, trap_handler是用于读的，其余是用于写的。**其中kernel_satp和kernel_sp在初始化之后保持不变**，而trap_handler在进入trap_handler时会被设置成trap_from_kernel，而在进入trap_return时会被设置回TRAMPOLINE。
 
-lab:
+### lab
 
 - PageTable::from_token只是用于trap后处于内核空间时，通过该token临时构造一个用于查询用户内存空间的页表，该页表不会被赋值给satp，不进行实际的地址转换作用，不负责管理用户帧的分配回收，frames置为空。
 

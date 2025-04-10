@@ -2,7 +2,7 @@
 # contain http (as opposeed to https) URLs. This would affect Google indexing of your URLs.
 baseURL: "http://localhost:1313/" # set to this, otehrwise images load will fail in local test
 title: csmyx
-copyright: "© [PaperMod Contributors](https://github.com/adityatelange/hugo-PaperMod/graphs/contributors)"
+# copyright: "© [PaperMod Contributors](https://github.com/adityatelange/hugo-PaperMod/graphs/contributors)"
 theme: [PaperMod]
 
 enableInlineShortcodes: true
@@ -111,7 +111,7 @@ params:
 
       - 1. <a href="https://opencamp.cn/os2edu/camp/2025spring" style="color: green; font-weight: bold;">2025春夏季开源操作系统训练营</a>: 
       This project is aim to write an OS kernel called rCore using Rust.
-      I will write my study notes about it in the series <a href="series/rcore-camp-guide-2025s/" style="color: green; font-weight: bold;">rCore-Camp-2025S</a>
+      I will write my study notes about it in the series <a href="series/rcore-camp-guide-2025s/" style="color: green; font-weight: bold;">rCore-Camp-2025S</a>.
 
       - 2. <a href="https://github.com/csmyx/xdb" style="color: green; font-weight: bold;">Building a Debugger</a>: 
       This project is to implement a debugger similar to GDB using modern C++.
@@ -182,8 +182,9 @@ markup:
       unsafe: true
   highlight:
     noClasses: false
+    lineNos: true
     # anchorLineNos: true
     # codeFences: true
-    # guessSyntax: true
-    lineNos: true
+    guessSyntax: true
+    style: github
     # style: monokai
