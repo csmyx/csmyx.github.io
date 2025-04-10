@@ -105,21 +105,21 @@ params:
   homeInfoParams:
     Title: "Welcome to my blog :-)"
     Content: >
-      Hi there 👋 , my name is [csmyx](https://github.com/csmyx). 
+      Hi there 👋 , my name is [@csmyx](https://github.com/csmyx). 
       
       - I'm currently coding in the following projects:
 
       - 1. <a href="https://opencamp.cn/os2edu/camp/2025spring" style="color: green; font-weight: bold;">2025春夏季开源操作系统训练营</a>: 
-      This project is aim to write an OS kernel called rCore using Rust.
+      This project is aim to write an OS kernel called rCore using Rust🦀.
       I will write my study notes about it in the series <a href="series/rcore-camp-guide-2025s/" style="color: green; font-weight: bold;">rCore-Camp-2025S</a>.
 
       - 2. <a href="https://github.com/csmyx/xdb" style="color: green; font-weight: bold;">Building a Debugger</a>: 
       This project is to implement a debugger similar to GDB using modern C++.
-      I will transfer my notes from the repos to here in the future.
+      I will transfer my notes from the repo to here in the future.
 
       - 3. <a href="https://skyzh.github.io/mini-lsm/" style="color: green; font-weight: bold;">mini-lsm</a>: 
-      It's about to build a key-value storage engine using Rust.
-      this is my <a href="https://github.com/csmyx/mini-lsm" style="color: green; font-weight: bold;">git repos</a> for this project.
+      It's about to build a key-value storage engine using Rust🦀.
+      this is my <a href="https://github.com/csmyx/mini-lsm/tree/lab1" style="color: green; font-weight: bold;">git repo</a> for this project.
       
 
   socialIcons:
