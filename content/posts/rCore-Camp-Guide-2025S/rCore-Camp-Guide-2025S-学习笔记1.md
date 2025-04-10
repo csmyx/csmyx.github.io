@@ -1,50 +1,14 @@
 ---
-date: '2025-04-10T05:22:17+08:00'
-draft: false
-title: 'rCore-Camp-2025S 学习笔记'
+author: 'csmyx'
+date: '2025-04-10T18:16:54+08:00'
+title: 'RCore Camp Guide 2025S 学习笔记1'
+description: 'RCore Camp Guide 2025S 学习笔记1'
+summary: 'RCore Camp Guide 2025S 学习笔记1'
+# tags: ["Rust", "OS"]
+# categories: ["Rust", "OS"]
+series: ["rCore-Camp-Guide-2025S"]
+disableShare: true
 ---
-
-## chapter 1
-
-### remove std-lib dependency
-
-#### remove std support
-Cause we want to develop our own os, so we can't depend on the `std` lib. so we add `#![no_std]` in front of main.rs to remove dependency on `std` lib. we only use the `core` lib, which is decouple from os (I think).
-
-#### add panic_handler
-We need a panic_handler to make the crab happy. It is support by `std`, but not `core`. So we add it manually in a mod `lang_items`. Then we remove the main function, and add `#![no_main]` in fron of main.rs too. Now we finally got a useless but complete program, that doesn't rely on std lib provided by os!
-
-### Build a user-space execution environment
-
-#### support syscall
-Implement syscall function by `ecall` in risc-v assembly.
-
-#### support exit 
-Call #93 of syscall, with exit state number as args0.
-
-#### support print
-Call #64 of syscall, with fd as args0, buffer ptr as args1, buffer len as args2. Then implement formatting macros: `print!` and `println!`. So we got our hello world program ourselves instead of std-lib!
-
-### Build a bare-metal execution environment
-
-#### support shutdown
-Use `ecall` to implement shutdown, althgh it's the same option instrucion we used earlier, but now we are using it to call SBI to shutdown the kernel, while we used it to call OS to support syscall before.
-
-#### set memory layout by linker script
-Add a linker script `src/linker.ld` to manually control the memory layout of the elf file.
-
-#### configure the stack space layout
-Add `src/entry.asm` to init the stack space by assembly.
-
-#### clear bss section
-bss section is used to store uninitialized global variables and static variables declared in the program. And it's os's responsibility to zero out the contents of this section. So we add a function `clear_bss` to do it, and we used the symbol sbss and ebss to determine the start and end address of bss section.
-
-#### add logging
-Add `src/logging.rs` to support nice logging.
-
-## chapter 2
-## chapter 3
-## chapter 4
 
 ### 陷入trap
 
@@ -117,7 +81,7 @@ __alltraps:
 
 ### trap返回
 
-```asm
+```assembly
 __restore:
     # a0: *TrapContext in user space(Constant); a1: user space token
     # switch to user space
@@ -194,41 +158,11 @@ lab:
 
   最低一级页表的RWXU标志位是根据逻辑段MapArea的map permission来设置，**因此用户可访问权限的逻辑段的初始化，一定要赋予该U权限。**
 
-```rust
-/// Include sections in elf and trampoline and TrapContext and user stack,
-/// also returns user_sp_base and entry point.
-pub fn from_elf(elf_data: &[u8]) -> (Self, usize, usize) {
-    let mut memory_set = Self::new_bare();
-    // map trampoline
-    memory_set.map_trampoline();
-    // map program headers of elf, with U flag
-    let elf = xmas_elf::ElfFile::new(elf_data).unwrap();
-    let elf_header = elf.header;
-    let magic = elf_header.pt1.magic;
-    assert_eq!(magic, [0x7f, 0x45, 0x4c, 0x46], "invalid elf!");
-    let ph_count = elf_header.pt2.ph_count();
-    let mut max_end_vpn = VirtPageNum(0);
-    for i in 0..ph_count {
-        let ph = elf.program_header(i).unwrap();
-        if ph.get_type().unwrap() == xmas_elf::program::Type::Load {
-            let start_va: VirtAddr = (ph.virtual_addr() as usize).into();
-            let end_va: VirtAddr = ((ph.virtual_addr() + ph.mem_size()) as usize).into();
-            let mut map_perm = MapPermission::U;
-            let ph_flags = ph.flags();
-            if ph_flags.is_read() {
-                map_perm |= MapPermission::R;
-            }
-        }
-    }
-}
-
-```
-  <img src="fig1.png" alt="load faild" style="zoom:50%;" />
+  <img src="C:\Users\15023\AppData\Roaming\Typora\typora-user-images\image-20250408200417859.png" alt="image-20250408200417859" style="zoom:50%;" />
 
   与该标志位设置相关的bugfix：
 
-  <img src="fig2.png" alt="load faild" style="zoom:50%;" />
+  <img src="C:\Users\15023\AppData\Roaming\Typora\typora-user-images\image-20250408201914203.png" alt="image-20250408201914203" style="zoom:50%;" />
 
-  <img src="fig3.png" alt="load faild" style="zoom:50%;" />
-
+  <img src="C:\Users\15023\AppData\Roaming\Typora\typora-user-images\image-20250408202012929.png" alt="image-20250408202012929" style="zoom:50%;" />
 
