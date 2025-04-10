@@ -3,7 +3,7 @@ author: 'csmyx'
 date: '{{ .Date }}'
 disableShare: true
 title: '{{ replace .File.ContentBaseName "-" " " | title }}'
-description: '{{ replace .File.ContentBaseName "-" " " | title }}'
+# description: '{{ replace .File.ContentBaseName "-" " " | title }}'
 summary: '{{ replace .File.ContentBaseName "-" " " | title }}'
 # tags: ["Rust", "OS"]
 # categories: ["Rust", "OS"]
