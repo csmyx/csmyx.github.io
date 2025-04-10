@@ -1,12 +1,10 @@
 ---
 author: 'csmyx'
 date: '{{ .Date }}'
-title: '{{ replace .File.ContentBaseName "-" " " | title }}  {{.File.ContentBaseName}}'
-description: '{{ .File.Dir }}'
-draft: false
-ShowToc: true
-TocOpen: true
-ShowBreadCrumbs: false
+disableShare: true
+title: '{{ replace .File.ContentBaseName "-" " " | title }}'
+description: '{{ replace .File.ContentBaseName "-" " " | title }}'
+summary: '{{ replace .File.ContentBaseName "-" " " | title }}'
 # tags: ["Rust", "OS"]
 # categories: ["Rust", "OS"]
 series: ["{{ path.Dir .File.Path | path.Base }}"]
