@@ -12,14 +12,21 @@
     <generator>Hugo -- 0.145.0</generator>
     <language>en</language>
     <copyright>csmyx</copyright>
-    <lastBuildDate>Thu, 10 Apr 2025 18:16:54 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 11 Apr 2025 20:19:01 +0800</lastBuildDate>
     <atom:link href="https://csmyx.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>rCore Camp Guide 2025S 学习笔记1</title>
-      <link>https://csmyx.github.io/posts/rcore-camp-guide-2025s/rcore-camp-guide-2025s-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B01/</link>
-      <pubDate>Thu, 10 Apr 2025 18:16:54 +0800</pubDate>
-      <guid>https://csmyx.github.io/posts/rcore-camp-guide-2025s/rcore-camp-guide-2025s-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B01/</guid>
-      <description>RCore Camp Guide 2025S 学习笔记1</description>
+      <title>rCore 学习笔记11</title>
+      <link>https://csmyx.github.io/posts/rcore-camp-guide-2025s/rcore-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B01/</link>
+      <pubDate>Fri, 11 Apr 2025 20:17:51 +0800</pubDate>
+      <guid>https://csmyx.github.io/posts/rcore-camp-guide-2025s/rcore-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B01/</guid>
+      <description>Series: rCore-Camp-Guide-2025S</description>
+    </item>
+    <item>
+      <title>test font1</title>
+      <link>https://csmyx.github.io/posts/blog-test/test-font/</link>
+      <pubDate>Fri, 11 Apr 2025 20:19:01 +0800</pubDate>
+      <guid>https://csmyx.github.io/posts/blog-test/test-font/</guid>
+      <description>Series: blog-test</description>
     </item>
   </channel>
 </rss>

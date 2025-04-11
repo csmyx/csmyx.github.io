@@ -12,12 +12,19 @@
     <generator>Hugo -- 0.145.0</generator>
     <language>en</language>
     <copyright>csmyx</copyright>
-    <lastBuildDate>Thu, 10 Apr 2025 18:16:54 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 11 Apr 2025 20:19:01 +0800</lastBuildDate>
     <atom:link href="https://csmyx.github.io/series/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Blog-Test</title>
+      <link>https://csmyx.github.io/series/blog-test/</link>
+      <pubDate>Fri, 11 Apr 2025 20:19:01 +0800</pubDate>
+      <guid>https://csmyx.github.io/series/blog-test/</guid>
+      <description></description>
+    </item>
     <item>
       <title>RCore-Camp-Guide-2025S</title>
       <link>https://csmyx.github.io/series/rcore-camp-guide-2025s/</link>
-      <pubDate>Thu, 10 Apr 2025 18:16:54 +0800</pubDate>
+      <pubDate>Fri, 11 Apr 2025 20:17:51 +0800</pubDate>
       <guid>https://csmyx.github.io/series/rcore-camp-guide-2025s/</guid>
       <description></description>
     </item>
