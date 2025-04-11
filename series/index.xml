@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Series on csmyx</title>
+    <link>http://localhost:1313/series/</link>
+    <description>Recent content in Series on csmyx</description>
+    <image>
+      <title>csmyx</title>
+      <url>http://localhost:1313/images/papermod-cover.png</url>
+      <link>http://localhost:1313/images/papermod-cover.png</link>
+    </image>
+    <generator>Hugo -- 0.145.0</generator>
+    <language>en</language>
+    <lastBuildDate>Thu, 10 Apr 2025 18:16:54 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/series/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>RCore-Camp-Guide-2025S</title>
+      <link>http://localhost:1313/series/rcore-camp-guide-2025s/</link>
+      <pubDate>Thu, 10 Apr 2025 18:16:54 +0800</pubDate>
+      <guid>http://localhost:1313/series/rcore-camp-guide-2025s/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>

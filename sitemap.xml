@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>http://localhost:1313/</loc>
+    <lastmod>2025-04-10T18:16:54+08:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/</loc>
+    <lastmod>2025-04-10T18:16:54+08:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/rcore-camp-guide-2025s/rcore-camp-guide-2025s-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B01/</loc>
+    <lastmod>2025-04-10T18:16:54+08:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/series/rcore-camp-guide-2025s/</loc>
+    <lastmod>2025-04-10T18:16:54+08:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/series/</loc>
+    <lastmod>2025-04-10T18:16:54+08:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/archives/</loc>
+  </url><url>
+    <loc>http://localhost:1313/categories/</loc>
+  </url><url>
+    <loc>http://localhost:1313/search/</loc>
+  </url><url>
+    <loc>http://localhost:1313/tags/</loc>
+  </url>
+</urlset>
