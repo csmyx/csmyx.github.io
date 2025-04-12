@@ -19,61 +19,21 @@
   </url><url>
     <loc>https://csmyx.github.io/zh/</loc>
     <lastmod>2025-04-12T00:27:16+08:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://csmyx.github.io/en/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="zh-CN"
-                href="https://csmyx.github.io/zh/"
-                />
   </url><url>
     <loc>https://csmyx.github.io/zh/posts/</loc>
     <lastmod>2025-04-12T00:27:16+08:00</lastmod>
   </url><url>
     <loc>https://csmyx.github.io/zh/series/</loc>
     <lastmod>2025-04-12T00:27:16+08:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://csmyx.github.io/en/series/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="zh-CN"
-                href="https://csmyx.github.io/zh/series/"
-                />
   </url><url>
     <loc>https://csmyx.github.io/zh/series/rcore-camp-guide-2025s/</loc>
     <lastmod>2025-04-11T22:24:57+08:00</lastmod>
   </url><url>
-    <loc>https://csmyx.github.io/zh/archives/</loc>
-  </url><url>
     <loc>https://csmyx.github.io/zh/categories/</loc>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://csmyx.github.io/en/categories/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="zh-CN"
-                href="https://csmyx.github.io/zh/categories/"
-                />
   </url><url>
     <loc>https://csmyx.github.io/zh/tags/</loc>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://csmyx.github.io/en/tags/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="zh-CN"
-                href="https://csmyx.github.io/zh/tags/"
-                />
+  </url><url>
+    <loc>https://csmyx.github.io/zh/archives/</loc>
   </url><url>
     <loc>https://csmyx.github.io/zh/search/</loc>
   </url>
