@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>rCore 学习笔记0 | csmyx</title>
+<meta name="keywords" content="">
+<meta name="description" content="系列: rCore-Camp-Guide-2025S">
+<meta name="author" content="csmyx">
+<link rel="canonical" href="https://csmyx.github.io/zh/posts/rcore-camp-guide-2025s/rcore-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B00/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.39e47c616e3e0f7289d755b2ba1a62d8bc4acc0f9903926d737de0185ce03512.css" integrity="sha256-OeR8YW4&#43;D3KJ11Wyuhpi2LxKzA&#43;ZA5Jtc33gGFzgNRI=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://csmyx.github.io/favicon/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://csmyx.github.io/favicon/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://csmyx.github.io/favicon/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://csmyx.github.io/favicon/apple-touch-icon.png">
+<link rel="mask-icon" href="https://csmyx.github.io/favicon/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://csmyx.github.io/zh/posts/rcore-camp-guide-2025s/rcore-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B00/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:url" content="https://csmyx.github.io/zh/posts/rcore-camp-guide-2025s/rcore-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B00/">
+  <meta property="og:site_name" content="csmyx">
+  <meta property="og:title" content="rCore 学习笔记0">
+  <meta property="og:description" content="系列: rCore-Camp-Guide-2025S">
+  <meta property="og:locale" content="zh-CN">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-04-13T19:32:15+08:00">
+    <meta property="article:modified_time" content="2025-04-13T19:32:15+08:00">
+      <meta property="og:image" content="https://csmyx.github.io/img/1.png">
+      <meta property="og:see_also" content="https://csmyx.github.io/zh/posts/rcore-camp-guide-2025s/rcore-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B02/">
+      <meta property="og:see_also" content="https://csmyx.github.io/zh/posts/rcore-camp-guide-2025s/rcore-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B01/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://csmyx.github.io/img/1.png">
+<meta name="twitter:title" content="rCore 学习笔记0">
+<meta name="twitter:description" content="系列: rCore-Camp-Guide-2025S">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "文章",
+      "item": "https://csmyx.github.io/zh/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "rCore 学习笔记0",
+      "item": "https://csmyx.github.io/zh/posts/rcore-camp-guide-2025s/rcore-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B00/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "rCore 学习笔记0",
+  "name": "rCore 学习笔记0",
+  "description": "系列: rCore-Camp-Guide-2025S",
+  "keywords": [
+    
+  ],
+  "articleBody": "本文内容 总结到chapter0到chapter2中的重要内容。\n内核初始化过程 相关文件 os/src/entry.asm\nos/src/link_app.S\nos/src/main.rs\n具体过程 1 2 3 4 5 6 7 pub fn rust_main() -\u003e ! { clear_bss(); logging::init(); trap::init(); batch::init(); batch::run_next_app(); } [todo]\n构建运行过程 相关文件 os/Makefile user/Makefile user/build.py 构建（build） 1 2 3 4 5 6 7 8 9 10 11 12 build: env $(KERNEL_BIN) env: (rustup target list | grep \"riscv64gc-unknown-none-elf (installed)\") || rustup target add $(TARGET) cargo install cargo-binutils rustup component add rust-src rustup component add llvm-tools-preview $(KERNEL_BIN): kernel @$(OBJCOPY) $(KERNEL_ELF) --strip-all -O binary $@ kernel: @make -C ../user build TEST=$(TEST) CHAPTER=$(CHAPTER) BASE=$(BASE) @echo Platform: $(BOARD) @cargo build $(MODE_ARG) 即构建可执行的内核二进制文件KERNEL_BIN，这玩意就是我们需要构建的目标产物，就是我们的kernel的实体，或者说叫内核镜像吧。\n构建过程如下：\nenv：测试构建环境\nkernel：进入到../user目录执行make build命令，构建用户程序文件。再执行cargo build命令build二进制文件。这里是关键。构建出来的用户程序二进制文件到底是怎么和内核二进制文件关联起来的呢？就是通过如下这行代码，执行了link_app.S中的汇编代码：\n1 2 // os/src/main.rs global_asm!(include_str!(\"link_app.S\")); 而link_app.S中的代码做的事情就是，将用户的二进制程序文件映射到内核二进制的数据段中。同时还生成了_num_app、app_0_start、app_0_end等符号，这样rust代码就可以利用这些符号找到各个用户程序的二进制了，需要运行某个用户程序时，就通过这些符号找到数据段中的指定用户程序的代码，将其复制到代码段中就可以执行了，该过程的具体代码查看load_app函数（该函数实现方式在chapter2和chapter3中有所不同，具体请看note2中的加载过程章节[todo] ）。\n$(KERNEL_BIN)：--strip-all去除多余信息，生成最终的镜像。\n运行（run） 1 2 3 4 5 @qemu-system-riscv64 \\ -machine virt \\ -nographic \\ -bios $(BOOTLOADER) \\ -device loader,file=$(KERNEL_BIN),addr=$(KERNEL_ENTRY_PA) 即运行qemu跑我们的内核，需要指定若干参数：\nfile=：指定的需要加载运行的内核镜像路径，即我们上面说的KERNEL_BIN。 addr=：指定内核加载地址。 链接过程 相关文件 os/src/linker.ld 具体过程 编译链接之后，程序中的每个变量符号被替换成了具体的地址值（不清楚的参考csapp相关章节）。\n一般来说，我们不需要关心具体的地址值是多少，交给链接器来决定就好。上层应用不关心变量的具体地址，只要别把不同变量映射到同个地址就行。\n但是们在链接内核二进制时，就需要关心了，比如设定各个段的加载地址，加载顺序，地址对齐等，主要包括text、rodata、data、bss这四个段。同时也添加一些符号，比如stext，etext来标记代码段的起始地址和终止地址。\n所以总结，链接脚本的作用就是控制链接后的二进制文件的地址空间布局。\n",
+  "wordCount" : "1041",
+  "inLanguage": "zh",
+  "image": "https://csmyx.github.io/img/1.png","datePublished": "2025-04-13T19:32:15+08:00",
+  "dateModified": "2025-04-13T19:32:15+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "csmyx"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://csmyx.github.io/zh/posts/rcore-camp-guide-2025s/rcore-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B00/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "csmyx",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://csmyx.github.io/favicon/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://csmyx.github.io/zh/" accesskey="h" title="csmyx (Alt + H)">csmyx</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://csmyx.github.io/zh/" title="首页">
+                    <span>首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://csmyx.github.io/zh/posts/" title="文章">
+                    <span>文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://csmyx.github.io/zh/series/" title="系列">
+                    <span>系列</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://csmyx.github.io/zh/archives/" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://csmyx.github.io/zh/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                    <span>搜索</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://csmyx.github.io/zh/">首页</a>&nbsp;»&nbsp;<a href="https://csmyx.github.io/zh/posts/">文章</a></div>
+    <h1 class="post-title entry-hint-parent">
+      rCore 学习笔记0
+    </h1>
+    <div class="post-meta"><span title='2025-04-13 19:32:15 +0800 +0800'>四月 13, 2025</span>&nbsp;·&nbsp;3 分钟&nbsp;·&nbsp;csmyx
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">目录</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e6%9c%ac%e6%96%87%e5%86%85%e5%ae%b9" aria-label="本文内容">本文内容</a><ul>
+                        
+                <li>
+                    <a href="#%e5%86%85%e6%a0%b8%e5%88%9d%e5%a7%8b%e5%8c%96%e8%bf%87%e7%a8%8b" aria-label="内核初始化过程">内核初始化过程</a><ul>
+                        
+                <li>
+                    <a href="#%e7%9b%b8%e5%85%b3%e6%96%87%e4%bb%b6" aria-label="相关文件">相关文件</a></li>
+                <li>
+                    <a href="#%e5%85%b7%e4%bd%93%e8%bf%87%e7%a8%8b" aria-label="具体过程">具体过程</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e6%9e%84%e5%bb%ba%e8%bf%90%e8%a1%8c%e8%bf%87%e7%a8%8b" aria-label="构建运行过程">构建运行过程</a><ul>
+                        
+                <li>
+                    <a href="#%e7%9b%b8%e5%85%b3%e6%96%87%e4%bb%b6-1" aria-label="相关文件">相关文件</a></li>
+                <li>
+                    <a href="#%e6%9e%84%e5%bb%babuild" aria-label="构建（build）">构建（build）</a></li>
+                <li>
+                    <a href="#%e8%bf%90%e8%a1%8crun" aria-label="运行（run）">运行（run）</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e9%93%be%e6%8e%a5%e8%bf%87%e7%a8%8b" aria-label="链接过程">链接过程</a><ul>
+                        
+                <li>
+                    <a href="#%e7%9b%b8%e5%85%b3%e6%96%87%e4%bb%b6-2" aria-label="相关文件">相关文件</a></li>
+                <li>
+                    <a href="#%e5%85%b7%e4%bd%93%e8%bf%87%e7%a8%8b-1" aria-label="具体过程">具体过程</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="本文内容">本文内容<a hidden class="anchor" aria-hidden="true" href="#本文内容">#</a></h2>
+<p>总结到chapter0到chapter2中的重要内容。</p>
+<h3 id="内核初始化过程">内核初始化过程<a hidden class="anchor" aria-hidden="true" href="#内核初始化过程">#</a></h3>
+<h4 id="相关文件">相关文件<a hidden class="anchor" aria-hidden="true" href="#相关文件">#</a></h4>
+<ul>
+<li>
+<p><code>os/src/entry.asm</code></p>
+</li>
+<li>
+<p><code>os/src/link_app.S</code></p>
+</li>
+<li>
+<p><code>os/src/main.rs</code></p>
+</li>
+</ul>
+<h4 id="具体过程">具体过程<a hidden class="anchor" aria-hidden="true" href="#具体过程">#</a></h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">rust_main</span><span class="p">()</span><span class="w"> </span>-&gt; <span class="o">!</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">clear_bss</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">logging</span>::<span class="n">init</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">trap</span>::<span class="n">init</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">batch</span>::<span class="n">init</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">batch</span>::<span class="n">run_next_app</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>[todo]</p>
+<h3 id="构建运行过程">构建运行过程<a hidden class="anchor" aria-hidden="true" href="#构建运行过程">#</a></h3>
+<h4 id="相关文件-1">相关文件<a hidden class="anchor" aria-hidden="true" href="#相关文件-1">#</a></h4>
+<ul>
+<li><code>os/Makefile</code></li>
+<li><code>user/Makefile</code></li>
+<li><code>user/build.py</code></li>
+</ul>
+<h4 id="构建build">构建（build）<a hidden class="anchor" aria-hidden="true" href="#构建build">#</a></h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-makefile" data-lang="makefile"><span class="line"><span class="cl"><span class="nf">build</span><span class="o">:</span> <span class="n">env</span> <span class="k">$(</span><span class="nv">KERNEL_BIN</span><span class="k">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">env</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="o">(</span>rustup target list <span class="p">|</span> grep <span class="s2">&#34;riscv64gc-unknown-none-elf (installed)&#34;</span><span class="o">)</span> <span class="o">||</span> rustup target add <span class="k">$(</span>TARGET<span class="k">)</span>
+</span></span><span class="line"><span class="cl">	cargo install cargo-binutils
+</span></span><span class="line"><span class="cl">	rustup component add rust-src
+</span></span><span class="line"><span class="cl">	rustup component add llvm-tools-preview
+</span></span><span class="line"><span class="cl"><span class="nf">$(KERNEL_BIN)</span><span class="o">:</span> <span class="n">kernel</span>
+</span></span><span class="line"><span class="cl">	@<span class="k">$(</span>OBJCOPY<span class="k">)</span> <span class="k">$(</span>KERNEL_ELF<span class="k">)</span> --strip-all -O binary <span class="nv">$@</span>
+</span></span><span class="line"><span class="cl"><span class="nf">kernel</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	@make -C ../user build <span class="nv">TEST</span><span class="o">=</span><span class="k">$(</span>TEST<span class="k">)</span> <span class="nv">CHAPTER</span><span class="o">=</span><span class="k">$(</span>CHAPTER<span class="k">)</span> <span class="nv">BASE</span><span class="o">=</span><span class="k">$(</span>BASE<span class="k">)</span>
+</span></span><span class="line"><span class="cl">	@echo Platform: <span class="k">$(</span>BOARD<span class="k">)</span>
+</span></span><span class="line"><span class="cl">	@cargo build <span class="k">$(</span>MODE_ARG<span class="k">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>即构建可执行的内核二进制文件<code>KERNEL_BIN</code>，这玩意就是我们需要构建的目标产物，就是我们的kernel的实体，或者说叫内核镜像吧。</p>
+<p>构建过程如下：</p>
+<ul>
+<li>
+<p>env：测试构建环境</p>
+</li>
+<li>
+<p>kernel：进入到<code>../user</code>目录执行<code>make build</code>命令，构建用户程序文件。再执行<code>cargo build</code>命令build二进制文件。这里是关键。构建出来的用户程序二进制文件到底是怎么和内核二进制文件关联起来的呢？就是通过如下这行代码，执行了<code>link_app.S</code>中的汇编代码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="c1">// os/src/main.rs
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="fm">global_asm!</span><span class="p">(</span><span class="fm">include_str!</span><span class="p">(</span><span class="s">&#34;link_app.S&#34;</span><span class="p">));</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>而<code>link_app.S</code>中的代码做的事情就是，将用户的二进制程序文件映射到内核二进制的数据段中。同时还生成了<code>_num_app</code>、<code>app_0_start</code>、<code>app_0_end</code>等符号，这样<code>rust</code>代码就可以利用这些符号找到各个用户程序的二进制了，需要运行某个用户程序时，就通过这些符号找到数据段中的指定用户程序的代码，将其复制到代码段中就可以执行了，该过程的具体代码查看<code>load_app</code>函数（该函数实现方式在chapter2和chapter3中有所不同，具体请看note2中的加载过程章节[todo] ）。</p>
+</li>
+<li>
+<p>$(KERNEL_BIN)：<code>--strip-all</code>去除多余信息，生成最终的镜像。</p>
+</li>
+</ul>
+<h4 id="运行run">运行（run）<a hidden class="anchor" aria-hidden="true" href="#运行run">#</a></h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-makefile" data-lang="makefile"><span class="line"><span class="cl"><span class="err">@qemu-system-riscv64</span> <span class="err">\</span>
+</span></span><span class="line"><span class="cl">		<span class="err">-machine</span> <span class="err">virt</span> <span class="err">\</span>
+</span></span><span class="line"><span class="cl">		<span class="err">-nographic</span> <span class="err">\</span>
+</span></span><span class="line"><span class="cl">		<span class="err">-bios</span> <span class="k">$(</span><span class="nv">BOOTLOADER</span><span class="k">)</span> <span class="err">\</span>
+</span></span><span class="line"><span class="cl">		<span class="err">-device</span> <span class="err">loader,</span><span class="nv">file</span><span class="o">=</span><span class="k">$(</span>KERNEL_BIN<span class="k">)</span>,addr<span class="o">=</span><span class="k">$(</span>KERNEL_ENTRY_PA<span class="k">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>即运行<code>qemu</code>跑我们的内核，需要指定若干参数：</p>
+<ul>
+<li><code>file=</code>：指定的需要加载运行的内核镜像路径，即我们上面说的<code>KERNEL_BIN</code>。</li>
+<li><code>addr=</code>：指定内核加载地址。</li>
+</ul>
+<h3 id="链接过程">链接过程<a hidden class="anchor" aria-hidden="true" href="#链接过程">#</a></h3>
+<h4 id="相关文件-2">相关文件<a hidden class="anchor" aria-hidden="true" href="#相关文件-2">#</a></h4>
+<ul>
+<li><code>os/src/linker.ld</code></li>
+</ul>
+<h4 id="具体过程-1">具体过程<a hidden class="anchor" aria-hidden="true" href="#具体过程-1">#</a></h4>
+<p>编译链接之后，程序中的每个变量符号被替换成了具体的地址值（不清楚的参考<code>csapp</code>相关章节）。</p>
+<p>一般来说，我们不需要关心具体的地址值是多少，交给链接器来决定就好。上层应用不关心变量的具体地址，只要别把不同变量映射到同个地址就行。</p>
+<p>但是们在链接内核二进制时，就需要关心了，比如设定各个段的加载地址，加载顺序，地址对齐等，主要包括<code>text</code>、<code>rodata</code>、<code>data</code>、<code>bss</code>这四个段。同时也添加一些符号，比如<code>stext</code>，<code>etext</code>来标记代码段的起始地址和终止地址。</p>
+<p>所以总结，链接脚本的作用就是控制链接后的二进制文件的地址空间布局。</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>© <a href="https://github.com/csmyx/csmyx.github.io">csmyx</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
