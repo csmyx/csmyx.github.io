@@ -7,7 +7,7 @@
 <meta name="robots" content="index, follow">
 <title>rCore 学习笔记0 | csmyx</title>
 <meta name="keywords" content="">
-<meta name="description" content="系列: rCore-Camp-Guide-2025S">
+<meta name="description" content="系列: rCore-Camp-Guide-2025S, 对应文档第0-2章的内容">
 <meta name="author" content="csmyx">
 <link rel="canonical" href="https://csmyx.github.io/zh/posts/rcore-camp-guide-2025s/rcore-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B00/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.39e47c616e3e0f7289d755b2ba1a62d8bc4acc0f9903926d737de0185ce03512.css" integrity="sha256-OeR8YW4&#43;D3KJ11Wyuhpi2LxKzA&#43;ZA5Jtc33gGFzgNRI=" rel="preload stylesheet" as="style">
@@ -58,7 +58,7 @@
 </noscript><meta property="og:url" content="https://csmyx.github.io/zh/posts/rcore-camp-guide-2025s/rcore-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B00/">
   <meta property="og:site_name" content="csmyx">
   <meta property="og:title" content="rCore 学习笔记0">
-  <meta property="og:description" content="系列: rCore-Camp-Guide-2025S">
+  <meta property="og:description" content="系列: rCore-Camp-Guide-2025S, 对应文档第0-2章的内容">
   <meta property="og:locale" content="zh-CN">
   <meta property="og:type" content="article">
     <meta property="article:section" content="posts">
@@ -70,7 +70,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://csmyx.github.io/img/1.png">
 <meta name="twitter:title" content="rCore 学习笔记0">
-<meta name="twitter:description" content="系列: rCore-Camp-Guide-2025S">
+<meta name="twitter:description" content="系列: rCore-Camp-Guide-2025S, 对应文档第0-2章的内容">
 
 
 <script type="application/ld+json">
@@ -99,12 +99,12 @@
   "@type": "BlogPosting",
   "headline": "rCore 学习笔记0",
   "name": "rCore 学习笔记0",
-  "description": "系列: rCore-Camp-Guide-2025S",
+  "description": "系列: rCore-Camp-Guide-2025S, 对应文档第0-2章的内容",
   "keywords": [
     
   ],
-  "articleBody": "本文内容 总结到chapter0到chapter2中的重要内容。\n内核初始化过程 相关文件 os/src/entry.asm\nos/src/link_app.S\nos/src/main.rs\n具体过程 1 2 3 4 5 6 7 pub fn rust_main() -\u003e ! { clear_bss(); logging::init(); trap::init(); batch::init(); batch::run_next_app(); } [todo]\n构建运行过程 相关文件 os/Makefile user/Makefile user/build.py 构建（build） 1 2 3 4 5 6 7 8 9 10 11 12 build: env $(KERNEL_BIN) env: (rustup target list | grep \"riscv64gc-unknown-none-elf (installed)\") || rustup target add $(TARGET) cargo install cargo-binutils rustup component add rust-src rustup component add llvm-tools-preview $(KERNEL_BIN): kernel @$(OBJCOPY) $(KERNEL_ELF) --strip-all -O binary $@ kernel: @make -C ../user build TEST=$(TEST) CHAPTER=$(CHAPTER) BASE=$(BASE) @echo Platform: $(BOARD) @cargo build $(MODE_ARG) 即构建可执行的内核二进制文件KERNEL_BIN，这玩意就是我们需要构建的目标产物，就是我们的kernel的实体，或者说叫内核镜像吧。\n构建过程如下：\nenv：测试构建环境\nkernel：进入到../user目录执行make build命令，构建用户程序文件。再执行cargo build命令build二进制文件。这里是关键。构建出来的用户程序二进制文件到底是怎么和内核二进制文件关联起来的呢？就是通过如下这行代码，执行了link_app.S中的汇编代码：\n1 2 // os/src/main.rs global_asm!(include_str!(\"link_app.S\")); 而link_app.S中的代码做的事情就是，将用户的二进制程序文件映射到内核二进制的数据段中。同时还生成了_num_app、app_0_start、app_0_end等符号，这样rust代码就可以利用这些符号找到各个用户程序的二进制了，需要运行某个用户程序时，就通过这些符号找到数据段中的指定用户程序的代码，将其复制到代码段中就可以执行了，该过程的具体代码查看load_app函数（该函数实现方式在chapter2和chapter3中有所不同，具体请看note2中的加载过程章节[todo] ）。\n$(KERNEL_BIN)：--strip-all去除多余信息，生成最终的镜像。\n运行（run） 1 2 3 4 5 @qemu-system-riscv64 \\ -machine virt \\ -nographic \\ -bios $(BOOTLOADER) \\ -device loader,file=$(KERNEL_BIN),addr=$(KERNEL_ENTRY_PA) 即运行qemu跑我们的内核，需要指定若干参数：\nfile=：指定的需要加载运行的内核镜像路径，即我们上面说的KERNEL_BIN。 addr=：指定内核加载地址。 链接过程 相关文件 os/src/linker.ld 具体过程 编译链接之后，程序中的每个变量符号被替换成了具体的地址值（不清楚的参考csapp相关章节）。\n一般来说，我们不需要关心具体的地址值是多少，交给链接器来决定就好。上层应用不关心变量的具体地址，只要别把不同变量映射到同个地址就行。\n但是们在链接内核二进制时，就需要关心了，比如设定各个段的加载地址，加载顺序，地址对齐等，主要包括text、rodata、data、bss这四个段。同时也添加一些符号，比如stext，etext来标记代码段的起始地址和终止地址。\n所以总结，链接脚本的作用就是控制链接后的二进制文件的地址空间布局。\n",
-  "wordCount" : "1041",
+  "articleBody": "总结到chapter0到chapter2中的重要内容。\n内核初始化过程 相关文件 os/src/entry.asm\nos/src/link_app.S\nos/src/main.rs\n具体过程 1 2 3 4 5 6 7 pub fn rust_main() -\u003e ! { clear_bss(); logging::init(); trap::init(); batch::init(); batch::run_next_app(); } [todo]\n构建运行过程 相关文件 os/Makefile user/Makefile user/build.py 构建（build） 1 2 3 4 5 6 7 8 9 10 11 12 build: env $(KERNEL_BIN) env: (rustup target list | grep \"riscv64gc-unknown-none-elf (installed)\") || rustup target add $(TARGET) cargo install cargo-binutils rustup component add rust-src rustup component add llvm-tools-preview $(KERNEL_BIN): kernel @$(OBJCOPY) $(KERNEL_ELF) --strip-all -O binary $@ kernel: @make -C ../user build TEST=$(TEST) CHAPTER=$(CHAPTER) BASE=$(BASE) @echo Platform: $(BOARD) @cargo build $(MODE_ARG) 即构建可执行的内核二进制文件KERNEL_BIN，这玩意就是我们需要构建的目标产物，就是我们的kernel的实体，或者说叫内核镜像吧。\n构建过程如下：\nenv：测试构建环境\nkernel：进入到../user目录执行make build命令，构建用户程序文件。再执行cargo build命令build二进制文件。这里是关键。构建出来的用户程序二进制文件到底是怎么和内核二进制文件关联起来的呢？就是通过如下这行代码，执行了link_app.S中的汇编代码：\n1 2 // os/src/main.rs global_asm!(include_str!(\"link_app.S\")); 而link_app.S中的代码做的事情就是，将用户的二进制程序文件映射到内核二进制的数据段中。同时还生成了_num_app、app_0_start、app_0_end等符号，这样rust代码就可以利用这些符号找到各个用户程序的二进制了，需要运行某个用户程序时，就通过这些符号找到数据段中的指定用户程序的代码，将其复制到代码段中就可以执行了，该过程的具体代码查看load_app函数（该函数实现方式在chapter2和chapter3中有所不同，具体请看note2中的加载过程章节[todo] ）。\n$(KERNEL_BIN)：--strip-all去除多余信息，生成最终的镜像。\n运行（run） 1 2 3 4 5 @qemu-system-riscv64 \\ -machine virt \\ -nographic \\ -bios $(BOOTLOADER) \\ -device loader,file=$(KERNEL_BIN),addr=$(KERNEL_ENTRY_PA) 即运行qemu跑我们的内核，需要指定若干参数：\nfile=：指定的需要加载运行的内核镜像路径，即我们上面说的KERNEL_BIN。 addr=：指定内核加载地址。 链接过程 相关文件 os/src/linker.ld 具体过程 编译链接之后，程序中的每个变量符号被替换成了具体的地址值（不清楚的参考csapp相关章节）。\n一般来说，我们不需要关心具体的地址值是多少，交给链接器来决定就好。上层应用不关心变量的具体地址，只要别把不同变量映射到同个地址就行。\n但是们在链接内核二进制时，就需要关心了，比如设定各个段的加载地址，加载顺序，地址对齐等，主要包括text、rodata、data、bss这四个段。同时也添加一些符号，比如stext，etext来标记代码段的起始地址和终止地址。\n所以总结，链接脚本的作用就是控制链接后的二进制文件的地址空间布局。\n",
+  "wordCount" : "1037",
   "inLanguage": "zh",
   "image": "https://csmyx.github.io/img/1.png","datePublished": "2025-04-13T19:32:15+08:00",
   "dateModified": "2025-04-13T19:32:15+08:00",
@@ -208,15 +208,12 @@
 
 </div>
   </header> <div class="toc">
-    <details  open>
+    <details >
         <summary accesskey="c" title="(Alt + C)">
             <span class="details">目录</span>
         </summary>
 
         <div class="inner"><ul>
-                <li>
-                    <a href="#%e6%9c%ac%e6%96%87%e5%86%85%e5%ae%b9" aria-label="本文内容">本文内容</a><ul>
-                        
                 <li>
                     <a href="#%e5%86%85%e6%a0%b8%e5%88%9d%e5%a7%8b%e5%8c%96%e8%bf%87%e7%a8%8b" aria-label="内核初始化过程">内核初始化过程</a><ul>
                         
@@ -246,14 +243,11 @@
             </ul>
             </li>
             </ul>
-            </li>
-            </ul>
         </div>
     </details>
 </div>
 
-  <div class="post-content"><h2 id="本文内容">本文内容<a hidden class="anchor" aria-hidden="true" href="#本文内容">#</a></h2>
-<p>总结到chapter0到chapter2中的重要内容。</p>
+  <div class="post-content"><p>总结到chapter0到chapter2中的重要内容。</p>
 <h3 id="内核初始化过程">内核初始化过程<a hidden class="anchor" aria-hidden="true" href="#内核初始化过程">#</a></h3>
 <h4 id="相关文件">相关文件<a hidden class="anchor" aria-hidden="true" href="#相关文件">#</a></h4>
 <ul>
