@@ -12,8 +12,15 @@
     <generator>Hugo -- 0.145.0</generator>
     <language>zh-CN</language>
     <copyright>csmyx</copyright>
-    <lastBuildDate>Thu, 17 Apr 2025 01:05:55 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 19 Apr 2025 17:55:05 +0800</lastBuildDate>
     <atom:link href="https://csmyx.github.io/zh/series/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>网络问题</title>
+      <link>https://csmyx.github.io/zh/series/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/</link>
+      <pubDate>Sat, 19 Apr 2025 17:55:05 +0800</pubDate>
+      <guid>https://csmyx.github.io/zh/series/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/</guid>
+      <description></description>
+    </item>
     <item>
       <title>RCore-Camp-Guide-2025S</title>
       <link>https://csmyx.github.io/zh/series/rcore-camp-guide-2025s/</link>

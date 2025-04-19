@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>git clone异常问题排查 | csmyx</title>
+<meta name="keywords" content="">
+<meta name="description" content="系列: 网络问题">
+<meta name="author" content="csmyx">
+<link rel="canonical" href="https://csmyx.github.io/zh/posts/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/note1/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.745fdfc466afc3572ead96423ed5fa4b204215d49f84183b10faa939bc5db88d.css" integrity="sha256-dF/fxGavw1curZZCPtX6SyBCFdSfhBg7EPqpObxduI0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://csmyx.github.io/favicon/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://csmyx.github.io/favicon/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://csmyx.github.io/favicon/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://csmyx.github.io/favicon/apple-touch-icon.png">
+<link rel="mask-icon" href="https://csmyx.github.io/favicon/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://csmyx.github.io/zh/posts/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/note1/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:url" content="https://csmyx.github.io/zh/posts/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/note1/">
+  <meta property="og:site_name" content="csmyx">
+  <meta property="og:title" content="git clone异常问题排查">
+  <meta property="og:description" content="系列: 网络问题">
+  <meta property="og:locale" content="zh-CN">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-04-19T17:55:05+08:00">
+    <meta property="article:modified_time" content="2025-04-19T17:55:05+08:00">
+      <meta property="og:image" content="https://csmyx.github.io/img/1.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://csmyx.github.io/img/1.png">
+<meta name="twitter:title" content="git clone异常问题排查">
+<meta name="twitter:description" content="系列: 网络问题">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "文章",
+      "item": "https://csmyx.github.io/zh/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "git clone异常问题排查",
+      "item": "https://csmyx.github.io/zh/posts/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/note1/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "git clone异常问题排查",
+  "name": "git clone异常问题排查",
+  "description": "系列: 网络问题",
+  "keywords": [
+    
+  ],
+  "articleBody": "记录一次git clone异常的网络问题排查经历和总结。\nwsl2 网络问题排查 最近我在写rcore的实现，昨天突然发现，我在wsl2里clone代码时无法通过ssh认证了：\n1 git clone git@github.com:LearningOS/rCore-Tutorial-Checker-2025S ci-user 明明是一次正常的clone代码操作，突然提示我输入密码，给我搞蒙了，我寻思我不是ssh方式clone的吗，为啥还要输入密码，关键我也没设置过哇。然后我又拿我自己的另一个仓库试了试，如下图所示，还是一样：\n为啥会提示输入密码呢，我查了一下，发现其实github ssh方式是可以在非对称加密之外，再额外配置一个密码，，其作用就是在私钥泄露之后还有一道防线。当然这个是可选项，也可以选择不配置。\n具体用法是，当你生成ssh密钥时，会提示是否设置密码，但是这里一般都是回车跳过选择不配置，所以我对这个没啥印象。。\n那么问题来了，既然我都没配置密码，为啥还会提示我输入密码？显然这时无论我输入什么都没用。接下来就是实际排查过程了\n排查过程 利用ssh -vT git@github.com，加上-v参数查看调试信息：\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 ❯ ssh -vT git@github.com OpenSSH_8.9p1 Ubuntu-3ubuntu0.11, OpenSSL 3.0.2 15 Mar 2022 debug1: Reading configuration data /etc/ssh/ssh_config debug1: /etc/ssh/ssh_config line 19: include /etc/ssh/ssh_config.d/*.conf matched no files debug1: /etc/ssh/ssh_config line 21: Applying options for * debug1: Connecting to github.com [::1] port 22. debug1: Connection established. debug1: identity file /home/hugo/.ssh/id_rsa type -1 debug1: identity file /home/hugo/.ssh/id_rsa-cert type -1 debug1: identity file /home/hugo/.ssh/id_ecdsa type -1 debug1: identity file /home/hugo/.ssh/id_ecdsa-cert type -1 debug1: identity file /home/hugo/.ssh/id_ecdsa_sk type -1 debug1: identity file /home/hugo/.ssh/id_ecdsa_sk-cert type -1 debug1: identity file /home/hugo/.ssh/id_ed25519 type 3 debug1: identity file /home/hugo/.ssh/id_ed25519-cert type -1 debug1: identity file /home/hugo/.ssh/id_ed25519_sk type -1 debug1: identity file /home/hugo/.ssh/id_ed25519_sk-cert type -1 debug1: identity file /home/hugo/.ssh/id_xmss type -1 debug1: identity file /home/hugo/.ssh/id_xmss-cert type -1 debug1: identity file /home/hugo/.ssh/id_dsa type -1 debug1: identity file /home/hugo/.ssh/id_dsa-cert type -1 debug1: Local version string SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.11 debug1: Remote protocol version 2.0, remote software version OpenSSH_8.9p1 Ubuntu-3ubuntu0.11 debug1: compat_banner: match: OpenSSH_8.9p1 Ubuntu-3ubuntu0.11 pat OpenSSH* compat 0x04000000 debug1: Authenticating to github.com:22 as 'git' debug1: load_hostkeys: fopen /home/hugo/.ssh/known_hosts2: No such file or directory debug1: load_hostkeys: fopen /etc/ssh/ssh_known_hosts: No such file or directory debug1: load_hostkeys: fopen /etc/ssh/ssh_known_hosts2: No such file or directory debug1: SSH2_MSG_KEXINIT sent debug1: SSH2_MSG_KEXINIT received debug1: kex: algorithm: curve25519-sha256 debug1: kex: host key algorithm: ssh-ed25519 debug1: kex: server-\u003eclient cipher: chacha20-poly1305@openssh.com MAC: compression: none debug1: kex: client-\u003eserver cipher: chacha20-poly1305@openssh.com MAC: compression: none debug1: expecting SSH2_MSG_KEX_ECDH_REPLY debug1: SSH2_MSG_KEX_ECDH_REPLY received debug1: Server host key: ssh-ed25519 SHA256:9Hm0FgEIUF+vuwAJS3i3cP0t7iMWmvdsjWI9Xj6SkFM debug1: load_hostkeys: fopen /home/hugo/.ssh/known_hosts2: No such file or directory debug1: load_hostkeys: fopen /etc/ssh/ssh_known_hosts: No such file or directory debug1: load_hostkeys: fopen /etc/ssh/ssh_known_hosts2: No such file or directory debug1: Host 'github.com' is known and matches the ED25519 host key. debug1: Found key in /home/hugo/.ssh/known_hosts:1 debug1: ssh_packet_send2_wrapped: resetting send seqnr 3 debug1: rekey out after 134217728 blocks debug1: SSH2_MSG_NEWKEYS sent debug1: expecting SSH2_MSG_NEWKEYS debug1: ssh_packet_read_poll2: resetting read seqnr 3 debug1: SSH2_MSG_NEWKEYS received debug1: rekey in after 134217728 blocks debug1: get_agent_identities: bound agent to hostkey debug1: get_agent_identities: ssh_fetch_identitylist: agent contains no identities debug1: Will attempt key: /home/hugo/.ssh/id_rsa debug1: Will attempt key: /home/hugo/.ssh/id_ecdsa debug1: Will attempt key: /home/hugo/.ssh/id_ecdsa_sk debug1: Will attempt key: /home/hugo/.ssh/id_ed25519 ED25519 SHA256:2VCfJ2gt7esKRuryTwGbO8FeU0xHUT6/yUWci2kt5nE debug1: Will attempt key: /home/hugo/.ssh/id_ed25519_sk debug1: Will attempt key: /home/hugo/.ssh/id_xmss debug1: Will attempt key: /home/hugo/.ssh/id_dsa debug1: SSH2_MSG_EXT_INFO received debug1: kex_input_ext_info: server-sig-algs= debug1: kex_input_ext_info: publickey-hostbound@openssh.com=\u003c0\u003e debug1: SSH2_MSG_SERVICE_ACCEPT received debug1: Authentications that can continue: publickey,password debug1: Next authentication method: publickey debug1: Trying private key: /home/hugo/.ssh/id_rsa debug1: Trying private key: /home/hugo/.ssh/id_ecdsa debug1: Trying private key: /home/hugo/.ssh/id_ecdsa_sk debug1: Offering public key: /home/hugo/.ssh/id_ed25519 ED25519 SHA256:2VCfJ2gt7esKRuryTwGbO8FeU0xHUT6/yUWci2kt5nE debug1: Authentications that can continue: publickey,password debug1: Trying private key: /home/hugo/.ssh/id_ed25519_sk debug1: Trying private key: /home/hugo/.ssh/id_xmss debug1: Trying private key: /home/hugo/.ssh/id_dsa debug1: Next authentication method: password git@github.com's password: 发现认证过程是先是尝试publickey然后再尝试password的。所以，问题就是出在我们公钥认证没通过，所以才提示我们用密码验证。接下来就是排查为啥公钥方式错误。\n公钥认证错误 以下常见的几个问题我都检查过，没有任何问题：\n密钥类型不能是旧版rsa github配置过程问题 文件权限问题 既然和ssh密钥配置过程没问题，接下来我怀疑是网络配置的问题。\nWSL2网络配置和代理问题 我首先怀疑的是wsl的镜像网络模式和我的clash 代理的协同有问题。之前我用的是wsl的NAT模式，改成镜像网络模式之后，WSL2与Windows宿主机共享一个局域网IP，localhost也指向一个，所以现在无需配置，就会走宿主机的clash代理了，理论上来说没问题，之前也用的好好的。而且这个是否走宿主机的系统代理也是有一个参数autoProxy=true可以在.wslconfig 里配置的，实际上这就是和我之前用NAT模式时需要手动配置http_proxy指向clash代理的ip和端口一样的，只是现在改成镜像网络之后，系统会自动帮我配置好了。\n所以排除是代理的问题，但是既然不是代理的问题\nclash代理的TUN配置 这个tun模式很强大，根据这篇文章，我理解他的作用是实现和wsl镜像模式类似的作用，而且更强大，等于是虚拟了一个接口，不仅代理了http，连底层的比如ping命令的icmp协议等都能代理。但是无论我是否开启tun，问题都存在，应该和这个没关系。\nssh配置问题 我之前根据Using SSH over the HTTPS port，配置过~/.ssh/config ，使用443端口来转发SSH而不是默认22端口。\n1 2 3 4 5 ❯ cat ~/.ssh/config Host github.com Hostname ssh.github.com Port 443 User git 我推测这应该是之前用wsl的NAT网络模式时遇到问题配置的，我将他去掉，也没有作用。\n域名解析问题 下面这个错误让我定位到了真正问题所在。\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 ❯ ssh -vT git@github.com @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ @ WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED! @ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY! Someone could be eavesdropping on you right now (man-in-the-middle attack)! It is also possible that a host key has just been changed. The fingerprint for the ED25519 key sent by the remote host is SHA256:9Hm0FgEIUF+vuwAJS3i3cP0t7iMWmvdsjWI9Xj6SkFM. Please contact your system administrator. Add correct host key in /home/hugo/.ssh/known_hosts to get rid of this message. Offending RSA key in /home/hugo/.ssh/known_hosts:3 remove with: ssh-keygen -f \"/home/hugo/.ssh/known_hosts\" -R \"github.com\" Host key for github.com has changed and you have requested strict checking. Host key verification failed. 当我第一次尝试ssh -T git@github.com命令，会打印了一个warning，提示fingerprint发生变化。fingerprint就是网站指纹，简单来说就是用来验证访问网站身份的，防止中间人攻击。\n~/.ssh/known_hosts文件与这个有关，该文件里保存之前通过验证的网站，这里会打印warning就是说明我当前访问的网站的fingerprint和历史认证不一致。我查了一下，github他的fingerprint都是可以在这里查到的，我这里的和官网给的居然真的对不上。。。\nwtf，难不成我还真遭遇了中间人攻击，登录到了假的github？\n仔细想了下，显然是我们的域名解析有问题。查了一下域名服务器配置文件/etc/resolv.conf：\n1 2 3 4 5 # This file was automatically generated by WSL. To stop automatic generation of this file, add the following entry to /etc/wsl.conf: # [network] # generateResolvConf = false nameserver 10.255.255.254 search lan 这也是wsl镜像模式自动配置的，namerserver的ip其实就是宿主机的ip，就是说域名解析是跟宿主机一样的。\n诡异的地方来了，为啥域名解析结果是127.0.0.1?\n白丝不得其解时，我发现，我的windows宿主机里的C:\\Users\\xxx\\.ssh\\config配置了这个：\n1 2 3 4 5 6 7 8 9 //socks5 Host github.com User git ProxyCommand connect -S 127.0.0.1:7891 %h %p //http || https Host github.com User git ProxyCommand connect -H 127.0.0.1:7891 %h %p 最终破案，就是因为我的宿主机里配置了，github走本地代理的127.0.0.1:7891，而wsl开启镜像模式之后，又是用的宿主机作为域名服务器，所以最后导致域名解析github.com时会变成127.0.0.1。(其实一开始git clone时提示信息里就显示了域名解析成了::1，只是我没注意。\n这个配置应该是我之前在windows上clone代码时发现没走代理配置的，应该是随便参考的类似这样的文章，好像是为了在windows上绕过 ssh 防火墙限制 。我不太清楚这个配置现在是否还有作用，但是这个就是问题根源，我也懒得改了，先不管windows了，至于这为啥会导致fingerprint发生变化，我也不太清楚。累了，先解决问题吧。\n我的方案是，修改wsl的域名解析不走宿主机，这样也不用改宿主机的里的~/.ssh\\config文件。测试了一下将wsl里的域名服务器改成不用自动生成的宿主机的ip，而是用114.114.114.114，域名解析也正常了，然后github公钥认证问题也没有了。\n下图所示，对比使用宿主机和114.114.114.114两者域名解析的结果：\n所以修改方案就是不要让wsl帮我们配置域名，而是我们自己配置。\n修改方案 按上文所示，手动配置DNS，在/etc/resolv.conf设置\n1 2 3 4 5 6 7 ❯ cat /etc/resolv.conf # This file was automatically generated by WSL. To stop automatic generation of this file, add the following entry to /etc/wsl.conf: # [network] # generateResolvConf = false nameserver 114.114.114.114 nameserver 8.8.8.8 search lan 按上面文件内提示，示在 /etc/wsl.conf中添加generateResolvConf = false设置\n1 2 3 4 5 6 7 ❯ cat /etc/wsl.conf [boot] systemd=true [network] generateResolvConf = false 但是上面这样配置之后，在wsl重启之后，/etc/resolv.conf没了，不会自动生成。所以需要我们手动再设置一遍，有点吗。这个以后再折腾吧。可参考这篇文章\nOK，问题解决了，我继续去写我的rcore实现了。\nTakeaway fingerprint 用于验证网站正确性，防止中间人攻击。~/.ssh/known_hosts保存着通过认证的网站信息\nwsl2镜像网络模式 如何让WSL2全局(包括ping)走Clash的HTTP代理\nclash代理的tun模式 在 WSL2 中使用 Clash for Windows 代理连接\n域名解析配置 Linux服务器配置DNS解析 查询域名解析命令：nslookup 域名 [DNS服务器IP]\n参考链接 About passphrases for SSH keys\n如何让WSL2全局(包括ping)走Clash的HTTP代理\nWindows配置git代理\n通过 HTTPS 端口使用 SSH，绕过代理防火墙\nWSL2的镜像网络模式\n在 WSL2 中使用 Clash for Windows 代理连接\nLinux服务器配置DNS解析 ",
+  "wordCount" : "3396",
+  "inLanguage": "zh",
+  "image": "https://csmyx.github.io/img/1.png","datePublished": "2025-04-19T17:55:05+08:00",
+  "dateModified": "2025-04-19T17:55:05+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "csmyx"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://csmyx.github.io/zh/posts/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/note1/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "csmyx",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://csmyx.github.io/favicon/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://csmyx.github.io/zh/" accesskey="h" title="csmyx (Alt + H)">csmyx</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://csmyx.github.io/zh/" title="首页">
+                    <span>首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://csmyx.github.io/zh/posts/" title="文章">
+                    <span>文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://csmyx.github.io/zh/series/" title="系列">
+                    <span>系列</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://csmyx.github.io/zh/archives/" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://csmyx.github.io/zh/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                    <span>搜索</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://csmyx.github.io/zh/">首页</a>&nbsp;»&nbsp;<a href="https://csmyx.github.io/zh/posts/">文章</a></div>
+    <h1 class="post-title entry-hint-parent">
+      git clone异常问题排查
+    </h1>
+    <div class="post-meta"><span title='2025-04-19 17:55:05 +0800 +0800'>四月 19, 2025</span>&nbsp;·&nbsp;7 分钟&nbsp;·&nbsp;csmyx
+
+</div>
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">目录</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#wsl2-%e7%bd%91%e7%bb%9c%e9%97%ae%e9%a2%98%e6%8e%92%e6%9f%a5" aria-label="wsl2 网络问题排查">wsl2 网络问题排查</a></li>
+                    <li>
+                        <a href="#%e6%8e%92%e6%9f%a5%e8%bf%87%e7%a8%8b" aria-label="排查过程">排查过程</a><ul>
+                            
+                    <li>
+                        <a href="#%e5%85%ac%e9%92%a5%e8%ae%a4%e8%af%81%e9%94%99%e8%af%af" aria-label="公钥认证错误">公钥认证错误</a></li>
+                    <li>
+                        <a href="#wsl2%e7%bd%91%e7%bb%9c%e9%85%8d%e7%bd%ae%e5%92%8c%e4%bb%a3%e7%90%86%e9%97%ae%e9%a2%98" aria-label="WSL2网络配置和代理问题">WSL2网络配置和代理问题</a></li>
+                    <li>
+                        <a href="#clash%e4%bb%a3%e7%90%86%e7%9a%84tun%e9%85%8d%e7%bd%ae" aria-label="clash代理的TUN配置">clash代理的TUN配置</a></li>
+                    <li>
+                        <a href="#ssh%e9%85%8d%e7%bd%ae%e9%97%ae%e9%a2%98" aria-label="ssh配置问题">ssh配置问题</a></li>
+                    <li>
+                        <a href="#%e5%9f%9f%e5%90%8d%e8%a7%a3%e6%9e%90%e9%97%ae%e9%a2%98" aria-label="域名解析问题">域名解析问题</a></li>
+                    <li>
+                        <a href="#%e4%bf%ae%e6%94%b9%e6%96%b9%e6%a1%88" aria-label="修改方案">修改方案</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#takeaway" aria-label="Takeaway">Takeaway</a><ul>
+                            
+                    <li>
+                        <a href="#fingerprint" aria-label="fingerprint">fingerprint</a></li>
+                    <li>
+                        <a href="#wsl2%e9%95%9c%e5%83%8f%e7%bd%91%e7%bb%9c%e6%a8%a1%e5%bc%8f" aria-label="wsl2镜像网络模式">wsl2镜像网络模式</a></li>
+                    <li>
+                        <a href="#clash%e4%bb%a3%e7%90%86%e7%9a%84tun%e6%a8%a1%e5%bc%8f" aria-label="clash代理的tun模式">clash代理的tun模式</a></li>
+                    <li>
+                        <a href="#%e5%9f%9f%e5%90%8d%e8%a7%a3%e6%9e%90%e9%85%8d%e7%bd%ae" aria-label="域名解析配置">域名解析配置</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e5%8f%82%e8%80%83%e9%93%be%e6%8e%a5" aria-label="参考链接">参考链接</a>
+                    </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 && 
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;   
+    }
+</script>
+  <div class="post-content"><p>记录一次<code>git clone</code>异常的网络问题排查经历和总结。</p>
+<h3 id="wsl2-网络问题排查">wsl2 网络问题排查<a hidden class="anchor" aria-hidden="true" href="#wsl2-网络问题排查">#</a></h3>
+<p>最近我在写<code>rcore</code>的实现，昨天突然发现，我在wsl2里clone代码时无法通过ssh认证了：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">git clone git@github.com:LearningOS/rCore-Tutorial-Checker-2025S ci-user
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>明明是一次正常的clone代码操作，突然提示我输入密码，给我搞蒙了，我寻思我不是ssh方式clone的吗，为啥还要输入密码，关键我也没设置过哇。然后我又拿我自己的另一个仓库试了试，如下图所示，还是一样：</p>
+<img src="/img/网络问题/note1/1.png#center" style="zoom:67%;" />
+<p>为啥会提示输入密码呢，我查了一下，发现其实github ssh方式是可以在非对称加密之外，再额外配置一个密码，，其作用就是在私钥泄露之后还有一道防线。当然这个是可选项，也可以选择不配置。</p>
+<p>具体用法是，当你生成ssh密钥时，会提示是否设置密码，但是这里一般都是回车跳过选择不配置，所以我对这个没啥印象。。</p>
+<img src="/img/网络问题/note1/2.png#center" style="zoom:67%;" />
+<p>那么问题来了，既然我都没配置密码，为啥还会提示我输入密码？显然这时无论我输入什么都没用。接下来就是实际排查过程了</p>
+<h3 id="排查过程">排查过程<a hidden class="anchor" aria-hidden="true" href="#排查过程">#</a></h3>
+<p>利用<code>ssh -vT git@github.com</code>，加上<code>-v</code>参数查看调试信息：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ ssh -vT git@github.com
+</span></span><span class="line"><span class="cl">OpenSSH_8.9p1 Ubuntu-3ubuntu0.11, OpenSSL 3.0.2 <span class="m">15</span> Mar <span class="m">2022</span>
+</span></span><span class="line"><span class="cl">debug1: Reading configuration data /etc/ssh/ssh_config
+</span></span><span class="line"><span class="cl">debug1: /etc/ssh/ssh_config line 19: include /etc/ssh/ssh_config.d/*.conf matched no files
+</span></span><span class="line"><span class="cl">debug1: /etc/ssh/ssh_config line 21: Applying options <span class="k">for</span> *
+</span></span><span class="line"><span class="cl">debug1: Connecting to github.com <span class="o">[</span>::1<span class="o">]</span> port 22.
+</span></span><span class="line"><span class="cl">debug1: Connection established.
+</span></span><span class="line"><span class="cl">debug1: identity file /home/hugo/.ssh/id_rsa <span class="nb">type</span> -1
+</span></span><span class="line"><span class="cl">debug1: identity file /home/hugo/.ssh/id_rsa-cert <span class="nb">type</span> -1
+</span></span><span class="line"><span class="cl">debug1: identity file /home/hugo/.ssh/id_ecdsa <span class="nb">type</span> -1
+</span></span><span class="line"><span class="cl">debug1: identity file /home/hugo/.ssh/id_ecdsa-cert <span class="nb">type</span> -1
+</span></span><span class="line"><span class="cl">debug1: identity file /home/hugo/.ssh/id_ecdsa_sk <span class="nb">type</span> -1
+</span></span><span class="line"><span class="cl">debug1: identity file /home/hugo/.ssh/id_ecdsa_sk-cert <span class="nb">type</span> -1
+</span></span><span class="line"><span class="cl">debug1: identity file /home/hugo/.ssh/id_ed25519 <span class="nb">type</span> <span class="m">3</span>
+</span></span><span class="line"><span class="cl">debug1: identity file /home/hugo/.ssh/id_ed25519-cert <span class="nb">type</span> -1
+</span></span><span class="line"><span class="cl">debug1: identity file /home/hugo/.ssh/id_ed25519_sk <span class="nb">type</span> -1
+</span></span><span class="line"><span class="cl">debug1: identity file /home/hugo/.ssh/id_ed25519_sk-cert <span class="nb">type</span> -1
+</span></span><span class="line"><span class="cl">debug1: identity file /home/hugo/.ssh/id_xmss <span class="nb">type</span> -1
+</span></span><span class="line"><span class="cl">debug1: identity file /home/hugo/.ssh/id_xmss-cert <span class="nb">type</span> -1
+</span></span><span class="line"><span class="cl">debug1: identity file /home/hugo/.ssh/id_dsa <span class="nb">type</span> -1
+</span></span><span class="line"><span class="cl">debug1: identity file /home/hugo/.ssh/id_dsa-cert <span class="nb">type</span> -1
+</span></span><span class="line"><span class="cl">debug1: Local version string SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.11
+</span></span><span class="line"><span class="cl">debug1: Remote protocol version 2.0, remote software version OpenSSH_8.9p1 Ubuntu-3ubuntu0.11
+</span></span><span class="line"><span class="cl">debug1: compat_banner: match: OpenSSH_8.9p1 Ubuntu-3ubuntu0.11 pat OpenSSH* compat 0x04000000
+</span></span><span class="line"><span class="cl">debug1: Authenticating to github.com:22 as <span class="s1">&#39;git&#39;</span>
+</span></span><span class="line"><span class="cl">debug1: load_hostkeys: fopen /home/hugo/.ssh/known_hosts2: No such file or directory
+</span></span><span class="line"><span class="cl">debug1: load_hostkeys: fopen /etc/ssh/ssh_known_hosts: No such file or directory
+</span></span><span class="line"><span class="cl">debug1: load_hostkeys: fopen /etc/ssh/ssh_known_hosts2: No such file or directory
+</span></span><span class="line"><span class="cl">debug1: SSH2_MSG_KEXINIT sent
+</span></span><span class="line"><span class="cl">debug1: SSH2_MSG_KEXINIT received
+</span></span><span class="line"><span class="cl">debug1: kex: algorithm: curve25519-sha256
+</span></span><span class="line"><span class="cl">debug1: kex: host key algorithm: ssh-ed25519
+</span></span><span class="line"><span class="cl">debug1: kex: server-&gt;client cipher: chacha20-poly1305@openssh.com MAC: &lt;implicit&gt; compression: none
+</span></span><span class="line"><span class="cl">debug1: kex: client-&gt;server cipher: chacha20-poly1305@openssh.com MAC: &lt;implicit&gt; compression: none
+</span></span><span class="line"><span class="cl">debug1: expecting SSH2_MSG_KEX_ECDH_REPLY
+</span></span><span class="line"><span class="cl">debug1: SSH2_MSG_KEX_ECDH_REPLY received
+</span></span><span class="line"><span class="cl">debug1: Server host key: ssh-ed25519 SHA256:9Hm0FgEIUF+vuwAJS3i3cP0t7iMWmvdsjWI9Xj6SkFM
+</span></span><span class="line"><span class="cl">debug1: load_hostkeys: fopen /home/hugo/.ssh/known_hosts2: No such file or directory
+</span></span><span class="line"><span class="cl">debug1: load_hostkeys: fopen /etc/ssh/ssh_known_hosts: No such file or directory
+</span></span><span class="line"><span class="cl">debug1: load_hostkeys: fopen /etc/ssh/ssh_known_hosts2: No such file or directory
+</span></span><span class="line"><span class="cl">debug1: Host <span class="s1">&#39;github.com&#39;</span> is known and matches the ED25519 host key.
+</span></span><span class="line"><span class="cl">debug1: Found key in /home/hugo/.ssh/known_hosts:1
+</span></span><span class="line"><span class="cl">debug1: ssh_packet_send2_wrapped: resetting send seqnr <span class="m">3</span>
+</span></span><span class="line"><span class="cl">debug1: rekey out after <span class="m">134217728</span> blocks
+</span></span><span class="line"><span class="cl">debug1: SSH2_MSG_NEWKEYS sent
+</span></span><span class="line"><span class="cl">debug1: expecting SSH2_MSG_NEWKEYS
+</span></span><span class="line"><span class="cl">debug1: ssh_packet_read_poll2: resetting <span class="nb">read</span> seqnr <span class="m">3</span>
+</span></span><span class="line"><span class="cl">debug1: SSH2_MSG_NEWKEYS received
+</span></span><span class="line"><span class="cl">debug1: rekey in after <span class="m">134217728</span> blocks
+</span></span><span class="line"><span class="cl">debug1: get_agent_identities: bound agent to hostkey
+</span></span><span class="line"><span class="cl">debug1: get_agent_identities: ssh_fetch_identitylist: agent contains no identities
+</span></span><span class="line"><span class="cl">debug1: Will attempt key: /home/hugo/.ssh/id_rsa
+</span></span><span class="line"><span class="cl">debug1: Will attempt key: /home/hugo/.ssh/id_ecdsa
+</span></span><span class="line"><span class="cl">debug1: Will attempt key: /home/hugo/.ssh/id_ecdsa_sk
+</span></span><span class="line"><span class="cl">debug1: Will attempt key: /home/hugo/.ssh/id_ed25519 ED25519 SHA256:2VCfJ2gt7esKRuryTwGbO8FeU0xHUT6/yUWci2kt5nE
+</span></span><span class="line"><span class="cl">debug1: Will attempt key: /home/hugo/.ssh/id_ed25519_sk
+</span></span><span class="line"><span class="cl">debug1: Will attempt key: /home/hugo/.ssh/id_xmss
+</span></span><span class="line"><span class="cl">debug1: Will attempt key: /home/hugo/.ssh/id_dsa
+</span></span><span class="line"><span class="cl">debug1: SSH2_MSG_EXT_INFO received
+</span></span><span class="line"><span class="cl">debug1: kex_input_ext_info: server-sig-algs<span class="o">=</span>&lt;ssh-ed25519,sk-ssh-ed25519@openssh.com,ssh-rsa,rsa-sha2-256,rsa-sha2-512,ssh-dss,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,sk-ecdsa-sha2-nistp256@openssh.com,webauthn-sk-ecdsa-sha2-nistp256@openssh.com&gt;
+</span></span><span class="line"><span class="cl">debug1: kex_input_ext_info: publickey-hostbound@openssh.com<span class="o">=</span>&lt;0&gt;
+</span></span><span class="line"><span class="cl">debug1: SSH2_MSG_SERVICE_ACCEPT received
+</span></span><span class="line"><span class="cl">debug1: Authentications that can <span class="k">continue</span>: publickey,password
+</span></span><span class="line"><span class="cl">debug1: Next authentication method: publickey
+</span></span><span class="line"><span class="cl">debug1: Trying private key: /home/hugo/.ssh/id_rsa
+</span></span><span class="line"><span class="cl">debug1: Trying private key: /home/hugo/.ssh/id_ecdsa
+</span></span><span class="line"><span class="cl">debug1: Trying private key: /home/hugo/.ssh/id_ecdsa_sk
+</span></span><span class="line"><span class="cl">debug1: Offering public key: /home/hugo/.ssh/id_ed25519 ED25519 SHA256:2VCfJ2gt7esKRuryTwGbO8FeU0xHUT6/yUWci2kt5nE
+</span></span><span class="line"><span class="cl">debug1: Authentications that can <span class="k">continue</span>: publickey,password
+</span></span><span class="line"><span class="cl">debug1: Trying private key: /home/hugo/.ssh/id_ed25519_sk
+</span></span><span class="line"><span class="cl">debug1: Trying private key: /home/hugo/.ssh/id_xmss
+</span></span><span class="line"><span class="cl">debug1: Trying private key: /home/hugo/.ssh/id_dsa
+</span></span><span class="line"><span class="cl">debug1: Next authentication method: password
+</span></span><span class="line"><span class="cl">git@github.com<span class="err">&#39;</span>s password:
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>发现认证过程是先是尝试<code>publickey</code>然后再尝试<code>password</code>的。所以，问题就是出在我们公钥认证没通过，所以才提示我们用密码验证。接下来就是排查为啥公钥方式错误。</p>
+<h4 id="公钥认证错误">公钥认证错误<a hidden class="anchor" aria-hidden="true" href="#公钥认证错误">#</a></h4>
+<p>以下常见的几个问题我都检查过，没有任何问题：</p>
+<ul>
+<li>密钥类型不能是旧版rsa</li>
+<li>github配置过程问题</li>
+<li>文件权限问题</li>
+</ul>
+<p>既然和ssh密钥配置过程没问题，接下来我怀疑是网络配置的问题。</p>
+<h4 id="wsl2网络配置和代理问题">WSL2网络配置和代理问题<a hidden class="anchor" aria-hidden="true" href="#wsl2网络配置和代理问题">#</a></h4>
+<p>我首先怀疑的是wsl的<a href="https://www.xiaoiluo.com/article/wsl2-network">镜像网络模式</a>和我的clash 代理的协同有问题。之前我用的是<code>wsl</code>的<code>NAT</code>模式，改成镜像网络模式之后，WSL2与Windows宿主机共享一个局域网IP，<code>localhost</code>也指向一个，所以现在无需配置，就会走宿主机的clash代理了，理论上来说没问题，之前也用的好好的。而且这个是否走宿主机的系统代理也是有一个参数<code>autoProxy=true</code>可以在<code>.wslconfig</code> 里配置的，实际上这就是和我之前用NAT模式时需要手动配置http_proxy指向clash代理的ip和端口一样的，只是现在改成镜像网络之后，系统会自动帮我配置好了。</p>
+<p>所以排除是代理的问题，但是既然不是代理的问题</p>
+<h4 id="clash代理的tun配置">clash代理的TUN配置<a hidden class="anchor" aria-hidden="true" href="#clash代理的tun配置">#</a></h4>
+<p>这个tun模式很强大，根据<a href="https://linux.do/t/topic/474787">这篇文章</a>，我理解他的作用是实现和wsl镜像模式类似的作用，而且更强大，等于是虚拟了一个接口，不仅代理了http，连底层的比如ping命令的icmp协议等都能代理。但是无论我是否开启tun，问题都存在，应该和这个没关系。</p>
+<h4 id="ssh配置问题">ssh配置问题<a hidden class="anchor" aria-hidden="true" href="#ssh配置问题">#</a></h4>
+<p>我之前根据<a href="https://docs.github.com/en/authentication/troubleshooting-ssh/using-ssh-over-the-https-port">Using SSH over the HTTPS port</a>，配置过<code>~/.ssh/config</code> ，使用443端口来转发SSH而不是默认22端口。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ cat ~/.ssh/config
+</span></span><span class="line"><span class="cl">Host github.com
+</span></span><span class="line"><span class="cl">    Hostname ssh.github.com
+</span></span><span class="line"><span class="cl">    Port <span class="m">443</span>
+</span></span><span class="line"><span class="cl">    User git
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>我推测这应该是之前用wsl的NAT网络模式时遇到问题配置的，我将他去掉，也没有作用。</p>
+<h4 id="域名解析问题">域名解析问题<a hidden class="anchor" aria-hidden="true" href="#域名解析问题">#</a></h4>
+<p>下面这个错误让我定位到了真正问题所在。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ ssh -vT git@github.com
+</span></span><span class="line"><span class="cl">@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+</span></span><span class="line"><span class="cl">@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+</span></span><span class="line"><span class="cl">@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+</span></span><span class="line"><span class="cl">IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+</span></span><span class="line"><span class="cl">Someone could be eavesdropping on you right now <span class="o">(</span>man-in-the-middle attack<span class="o">)</span>!
+</span></span><span class="line"><span class="cl">It is also possible that a host key has just been changed.
+</span></span><span class="line"><span class="cl">The fingerprint <span class="k">for</span> the ED25519 key sent by the remote host is
+</span></span><span class="line"><span class="cl">SHA256:9Hm0FgEIUF+vuwAJS3i3cP0t7iMWmvdsjWI9Xj6SkFM.
+</span></span><span class="line"><span class="cl">Please contact your system administrator.
+</span></span><span class="line"><span class="cl">Add correct host key in /home/hugo/.ssh/known_hosts to get rid of this message.
+</span></span><span class="line"><span class="cl">Offending RSA key in /home/hugo/.ssh/known_hosts:3
+</span></span><span class="line"><span class="cl">  remove with:
+</span></span><span class="line"><span class="cl">  ssh-keygen -f <span class="s2">&#34;/home/hugo/.ssh/known_hosts&#34;</span> -R <span class="s2">&#34;github.com&#34;</span>
+</span></span><span class="line"><span class="cl">Host key <span class="k">for</span> github.com has changed and you have requested strict checking.
+</span></span><span class="line"><span class="cl">Host key verification failed.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>当我第一次尝试<code>ssh -T git@github.com</code>命令，会打印了一个warning，提示fingerprint发生变化。fingerprint就是网站指纹，简单来说就是用来验证访问网站身份的，防止中间人攻击。</p>
+<p><code>~/.ssh/known_hosts</code>文件与这个有关，该文件里保存之前通过验证的网站，这里会打印warning就是说明我当前访问的网站的fingerprint和历史认证不一致。我查了一下，github他的fingerprint都是可以<a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints">在这里</a>查到的，我这里的和官网给的居然真的对不上。。。</p>
+<p>wtf，难不成我还真遭遇了<code>中间人攻击</code>，登录到了假的github？</p>
+<p>仔细想了下，显然是我们的域名解析有问题。查了一下域名服务器配置文件<code>/etc/resolv.conf</code>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># This file was automatically generated by WSL. To stop automatic generation of this file, add the following entry to /etc/wsl.conf:</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># [network]</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># generateResolvConf = false</span>
+</span></span><span class="line"><span class="cl">nameserver 10.255.255.254
+</span></span><span class="line"><span class="cl">search lan
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这也是wsl镜像模式自动配置的，namerserver的ip其实就是宿主机的ip，就是说域名解析是跟宿主机一样的。</p>
+<img src="/img/网络问题/note1/3.png#center" style="zoom:67%;" />
+<p>诡异的地方来了，为啥域名解析结果是127.0.0.1?</p>
+<p>白丝不得其解时，我发现，我的windows宿主机里的<code>C:\Users\xxx\.ssh\config</code>配置了这个：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">//socks5
+</span></span><span class="line"><span class="cl">Host github.com
+</span></span><span class="line"><span class="cl">User git
+</span></span><span class="line"><span class="cl">ProxyCommand connect -S 127.0.0.1:7891 %h %p
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">//http <span class="o">||</span> https
+</span></span><span class="line"><span class="cl">Host github.com
+</span></span><span class="line"><span class="cl">User git
+</span></span><span class="line"><span class="cl">ProxyCommand connect -H 127.0.0.1:7891 %h %p
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>最终破案，就是因为我的宿主机里配置了，github走本地代理的127.0.0.1:7891，而wsl开启镜像模式之后，又是用的宿主机作为域名服务器，所以最后导致域名解析github.com时会变成127.0.0.1。(其实一开始git clone时提示信息里就显示了域名解析成了<code>::1</code>，只是我没注意。</p>
+<p>这个配置应该是我之前在windows上clone代码时发现没走代理配置的，应该是随便参考的类似<a href="https://www.v2ex.com/t/841032">这样的文章</a>，好像是为了在windows上<a href="https://www.cnblogs.com/kaiye/p/9260367.html">绕过 ssh 防火墙限制 </a>。我不太清楚这个配置现在是否还有作用，但是这个就是问题根源，我也懒得改了，先不管windows了，至于这为啥会导致fingerprint发生变化，我也不太清楚。累了，先解决问题吧。</p>
+<p>我的方案是，修改wsl的域名解析不走宿主机，这样也不用改宿主机的里的<code>~/.ssh\config</code>文件。测试了一下将wsl里的域名服务器改成不用自动生成的宿主机的ip，而是用<code>114.114.114.114</code>，域名解析也正常了，然后github公钥认证问题也没有了。</p>
+<p>下图所示，对比使用宿主机和<code>114.114.114.114</code>两者域名解析的结果：</p>
+<img src="/img/网络问题/note1/4.png#center" style="zoom:67%;" />
+<p>所以修改方案就是不要让wsl帮我们配置域名，而是我们自己配置。</p>
+<h4 id="修改方案">修改方案<a hidden class="anchor" aria-hidden="true" href="#修改方案">#</a></h4>
+<p>按上文所示，手动配置DNS，在<code>/etc/resolv.conf</code>设置</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ cat /etc/resolv.conf
+</span></span><span class="line"><span class="cl"><span class="c1"># This file was automatically generated by WSL. To stop automatic generation of this file, add the following entry to /etc/wsl.conf:</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># [network]</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># generateResolvConf = false</span>
+</span></span><span class="line"><span class="cl">nameserver 114.114.114.114
+</span></span><span class="line"><span class="cl">nameserver 8.8.8.8
+</span></span><span class="line"><span class="cl">search lan
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>按上面文件内提示，示在<code> /etc/wsl.conf</code>中添加<code>generateResolvConf = false</code>设置</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">❯ cat /etc/wsl.conf
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>boot<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="nv">systemd</span><span class="o">=</span><span class="nb">true</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>network<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="nv">generateResolvConf</span> <span class="o">=</span> <span class="nb">false</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>但是上面这样配置之后，在wsl重启之后，<code>/etc/resolv.conf</code>没了，不会自动生成。所以需要我们手动再设置一遍，有点吗。这个以后再折腾吧。可参考<a href="https://www.cnblogs.com/cangqinglang/p/13343469.html">这篇文章</a></p>
+<p>OK，问题解决了，我继续去写我的<code>rcore</code>实现了。</p>
+<h3 id="takeaway">Takeaway<a hidden class="anchor" aria-hidden="true" href="#takeaway">#</a></h3>
+<h4 id="fingerprint">fingerprint<a hidden class="anchor" aria-hidden="true" href="#fingerprint">#</a></h4>
+<p>用于验证网站正确性，防止中间人攻击。<code>~/.ssh/known_hosts</code>保存着通过认证的网站信息</p>
+<h4 id="wsl2镜像网络模式">wsl2镜像网络模式<a hidden class="anchor" aria-hidden="true" href="#wsl2镜像网络模式">#</a></h4>
+<p><a href="https://linux.do/t/topic/474787">如何让WSL2全局(包括ping)走Clash的HTTP代理</a></p>
+<h4 id="clash代理的tun模式">clash代理的tun模式<a hidden class="anchor" aria-hidden="true" href="#clash代理的tun模式">#</a></h4>
+<p><a href="https://blog.east.monster/2022/10/05/clash-config-in-wsl">在 WSL2 中使用 Clash for Windows 代理连接</a></p>
+<h4 id="域名解析配置">域名解析配置<a hidden class="anchor" aria-hidden="true" href="#域名解析配置">#</a></h4>
+<p><a href="https://www.cnblogs.com/cangqinglang/p/13343469.html">Linux服务器配置DNS解析 </a></p>
+<p>查询域名解析命令：<code>nslookup 域名 [DNS服务器IP]</code></p>
+<h3 id="参考链接">参考链接<a hidden class="anchor" aria-hidden="true" href="#参考链接">#</a></h3>
+<ul>
+<li>
+<p><a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/working-with-ssh-key-passphrases#about-passphrases-for-ssh-keys">About passphrases for SSH keys</a></p>
+</li>
+<li>
+<p><a href="https://linux.do/t/topic/474787">如何让WSL2全局(包括ping)走Clash的HTTP代理</a></p>
+</li>
+<li>
+<p><a href="https://www.v2ex.com/t/841032">Windows配置git代理</a></p>
+</li>
+<li>
+<p><a href="https://docs.github.com/en/authentication/troubleshooting-ssh/using-ssh-over-the-https-port">通过 HTTPS 端口使用 SSH，绕过代理防火墙</a></p>
+</li>
+<li>
+<p><a href="https://www.xiaoiluo.com/article/wsl2-network">WSL2的镜像网络模式</a></p>
+</li>
+<li>
+<p><a href="https://blog.east.monster/2022/10/05/clash-config-in-wsl">在 WSL2 中使用 Clash for Windows 代理连接</a></p>
+</li>
+<li>
+<p><a href="https://www.cnblogs.com/cangqinglang/p/13343469.html">Linux服务器配置DNS解析 </a></p>
+</li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>© <a href="https://github.com/csmyx/csmyx.github.io">csmyx</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
