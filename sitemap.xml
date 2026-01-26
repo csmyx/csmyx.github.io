@@ -1,11 +1,43 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  
-  <sitemap>
-    <loc>https://csmyx.github.io/zh/sitemap.xml</loc>
-    
-      <lastmod>2025-04-19T17:55:05+08:00</lastmod>
-    
-  </sitemap>
-  
-</sitemapindex>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://csmyx.github.io/posts/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/note1/</loc>
+    <lastmod>2025-04-19T17:55:05+08:00</lastmod>
+  </url><url>
+    <loc>https://csmyx.github.io/posts/rcore-camp-guide-2025s/rcore-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B03/</loc>
+    <lastmod>2025-04-17T01:05:55+08:00</lastmod>
+  </url><url>
+    <loc>https://csmyx.github.io/posts/rcore-camp-guide-2025s/rcore-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B02/</loc>
+    <lastmod>2025-04-13T19:38:02+08:00</lastmod>
+  </url><url>
+    <loc>https://csmyx.github.io/posts/rcore-camp-guide-2025s/rcore-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B01/</loc>
+    <lastmod>2025-04-13T19:35:53+08:00</lastmod>
+  </url><url>
+    <loc>https://csmyx.github.io/posts/rcore-camp-guide-2025s/rcore-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B00/</loc>
+    <lastmod>2025-04-13T19:32:15+08:00</lastmod>
+  </url><url>
+    <loc>https://csmyx.github.io/</loc>
+    <lastmod>2025-04-19T17:55:05+08:00</lastmod>
+  </url><url>
+    <loc>https://csmyx.github.io/series/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/</loc>
+    <lastmod>2025-04-19T17:55:05+08:00</lastmod>
+  </url><url>
+    <loc>https://csmyx.github.io/posts/</loc>
+    <lastmod>2025-04-19T17:55:05+08:00</lastmod>
+  </url><url>
+    <loc>https://csmyx.github.io/series/</loc>
+    <lastmod>2025-04-19T17:55:05+08:00</lastmod>
+  </url><url>
+    <loc>https://csmyx.github.io/series/rcore-camp-guide-2025s/</loc>
+    <lastmod>2025-04-17T01:05:55+08:00</lastmod>
+  </url><url>
+    <loc>https://csmyx.github.io/categories/</loc>
+  </url><url>
+    <loc>https://csmyx.github.io/tags/</loc>
+  </url><url>
+    <loc>https://csmyx.github.io/archives/</loc>
+  </url><url>
+    <loc>https://csmyx.github.io/search/</loc>
+  </url>
+</urlset>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>系列 on home</title>
+    <link>https://csmyx.github.io/series/</link>
+    <description>Recent content in 系列 on home</description>
+    <image>
+      <title>home</title>
+      <url>https://csmyx.github.io/img/1.png</url>
+      <link>https://csmyx.github.io/img/1.png</link>
+    </image>
+    <generator>Hugo -- 0.145.0</generator>
+    <language>zh-CN</language>
+    <copyright>csmyx</copyright>
+    <lastBuildDate>Sat, 19 Apr 2025 17:55:05 +0800</lastBuildDate>
+    <atom:link href="https://csmyx.github.io/series/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>网络问题</title>
+      <link>https://csmyx.github.io/series/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/</link>
+      <pubDate>Sat, 19 Apr 2025 17:55:05 +0800</pubDate>
+      <guid>https://csmyx.github.io/series/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>RCore-Camp-Guide-2025S</title>
+      <link>https://csmyx.github.io/series/rcore-camp-guide-2025s/</link>
+      <pubDate>Thu, 17 Apr 2025 01:05:55 +0800</pubDate>
+      <guid>https://csmyx.github.io/series/rcore-camp-guide-2025s/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>
