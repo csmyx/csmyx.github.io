@@ -209,105 +209,149 @@
 
 </div>
   </header> <aside id="toc-container" class="toc-container wide">
-    <div class="toc">
-        <details  open>
-            <summary accesskey="c" title="(Alt + C)">
-                <span class="details">目录</span>
-            </summary>
+        <div class="toc">
+            <details  open>
+                <summary accesskey="c" title="(Alt + C)">
+                    <span class="details">目录</span>
+                </summary>
 
-            <div class="inner"><ul>
-                    <li>
-                        <a href="#%e5%86%85%e6%a0%b8%e5%88%9d%e5%a7%8b%e5%8c%96%e8%bf%87%e7%a8%8b" aria-label="内核初始化过程">内核初始化过程</a><ul>
-                            
-                    <li>
-                        <a href="#%e7%9b%b8%e5%85%b3%e6%96%87%e4%bb%b6" aria-label="相关文件">相关文件</a></li>
-                    <li>
-                        <a href="#%e5%85%b7%e4%bd%93%e8%bf%87%e7%a8%8b" aria-label="具体过程">具体过程</a></li></ul>
+                <div class="inner"><ul>
+                        <li>
+                            <a href="#%e5%86%85%e6%a0%b8%e5%88%9d%e5%a7%8b%e5%8c%96%e8%bf%87%e7%a8%8b" aria-label="内核初始化过程">内核初始化过程</a><ul>
+                                    
+                        <li>
+                            <a href="#%e7%9b%b8%e5%85%b3%e6%96%87%e4%bb%b6" aria-label="相关文件">相关文件</a></li>
+                        <li>
+                            <a href="#%e5%85%b7%e4%bd%93%e8%bf%87%e7%a8%8b" aria-label="具体过程">具体过程</a></li></ul>
+                        </li>
+                        <li>
+                            <a href="#%e6%9e%84%e5%bb%ba%e8%bf%90%e8%a1%8c%e8%bf%87%e7%a8%8b" aria-label="构建运行过程">构建运行过程</a><ul>
+                                    
+                        <li>
+                            <a href="#%e7%9b%b8%e5%85%b3%e6%96%87%e4%bb%b6-1" aria-label="相关文件">相关文件</a></li>
+                        <li>
+                            <a href="#%e6%9e%84%e5%bb%babuild" aria-label="构建（build）">构建（build）</a></li>
+                        <li>
+                            <a href="#%e8%bf%90%e8%a1%8crun" aria-label="运行（run）">运行（run）</a></li></ul>
+                        </li>
+                        <li>
+                            <a href="#%e9%93%be%e6%8e%a5%e8%bf%87%e7%a8%8b" aria-label="链接过程">链接过程</a><ul>
+                                    
+                        <li>
+                            <a href="#%e7%9b%b8%e5%85%b3%e6%96%87%e4%bb%b6-2" aria-label="相关文件">相关文件</a></li>
+                        <li>
+                            <a href="#%e5%85%b7%e4%bd%93%e8%bf%87%e7%a8%8b-1" aria-label="具体过程">具体过程</a>
+                        </li>
+                    </ul>
                     </li>
-                    <li>
-                        <a href="#%e6%9e%84%e5%bb%ba%e8%bf%90%e8%a1%8c%e8%bf%87%e7%a8%8b" aria-label="构建运行过程">构建运行过程</a><ul>
-                            
-                    <li>
-                        <a href="#%e7%9b%b8%e5%85%b3%e6%96%87%e4%bb%b6-1" aria-label="相关文件">相关文件</a></li>
-                    <li>
-                        <a href="#%e6%9e%84%e5%bb%babuild" aria-label="构建（build）">构建（build）</a></li>
-                    <li>
-                        <a href="#%e8%bf%90%e8%a1%8crun" aria-label="运行（run）">运行（run）</a></li></ul>
-                    </li>
-                    <li>
-                        <a href="#%e9%93%be%e6%8e%a5%e8%bf%87%e7%a8%8b" aria-label="链接过程">链接过程</a><ul>
-                            
-                    <li>
-                        <a href="#%e7%9b%b8%e5%85%b3%e6%96%87%e4%bb%b6-2" aria-label="相关文件">相关文件</a></li>
-                    <li>
-                        <a href="#%e5%85%b7%e4%bd%93%e8%bf%87%e7%a8%8b-1" aria-label="具体过程">具体过程</a>
-                    </li>
-                </ul>
-                </li>
-                </ul>
-            </div>
-        </details>
-    </div>
-</aside>
-<script>
-    let activeElement;
-    let elements;
-    window.addEventListener('DOMContentLoaded', function (event) {
-        checkTocPosition();
+                    </ul>
+                </div>
+            </details>
+        </div>
+    </aside>
+    <script>
+        let activeElement;
+        let elements;
+        let disableScrollActive = false;
+        let scrollTimer = null;
 
-        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
-         
-         activeElement = elements[0];
-         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
-         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
-     }, false);
+        window.addEventListener('DOMContentLoaded', function (event) {
+            checkTocPosition();
 
-    window.addEventListener('resize', function(event) {
-        checkTocPosition();
-    }, false);
+            elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+            
+            activeElement = elements[0];
+            const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+            document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
 
-    window.addEventListener('scroll', () => {
-        
-        activeElement = Array.from(elements).find((element) => {
-            if ((getOffsetTop(element) - window.pageYOffset) > 0 && 
-                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
-                return element;
+            
+            document.querySelectorAll('.inner ul li a').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    document.querySelectorAll('.inner ul li a.active').forEach(a => a.classList.remove('active'));
+                    this.classList.add('active');
+                    disableScrollActive = true;
+                    
+                    if (scrollTimer) clearTimeout(scrollTimer);
+                    scrollTimer = setTimeout(() => { disableScrollActive = false; }, 600); 
+                });
+            });
+        });
+
+        window.addEventListener('scroll', () => {
+            
+            if (scrollTimer) clearTimeout(scrollTimer);
+            scrollTimer = setTimeout(() => { disableScrollActive = false; }, 200);
+
+            if (disableScrollActive) return;
+            
+            let closest = elements[0];
+            let minDiff = Number.POSITIVE_INFINITY;
+            elements.forEach(element => {
+                const diff = window.pageYOffset - getOffsetTop(element);
+                if (diff >= -2 && Math.abs(diff) < minDiff) {
+                    minDiff = Math.abs(diff);
+                    closest = element;
+                }
+            });
+            activeElement = closest;
+            elements.forEach(element => {
+                const id = encodeURI(element.getAttribute('id')).toLowerCase();
+                const link = document.querySelector(`.inner ul li a[href="#${id}"]`);
+                if (element === activeElement) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }, false);
+
+        window.addEventListener('resize', function (event) {
+            checkTocPosition();
+        }, false);
+
+        window.addEventListener('scroll', () => {
+            if (disableScrollActive) return; 
+            
+            activeElement = Array.from(elements).find((element) => {
+                if ((getOffsetTop(element) - window.pageYOffset) > 0 &&
+                    (getOffsetTop(element) - window.pageYOffset) < window.innerHeight / 2) {
+                    return element;
+                }
+            }) || activeElement
+
+            elements.forEach(element => {
+                const id = encodeURI(element.getAttribute('id')).toLowerCase();
+                if (element === activeElement) {
+                    document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+                } else {
+                    document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+                }
+            })
+        }, false);
+
+        const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+        const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+        const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+        function checkTocPosition() {
+            const width = document.body.scrollWidth;
+
+            if (width - main - (toc * 2) - (gap * 4) > 0) {
+                document.getElementById("toc-container").classList.add("wide");
+            } else {
+                document.getElementById("toc-container").classList.remove("wide");
             }
-        }) || activeElement
-
-        elements.forEach(element => {
-             const id = encodeURI(element.getAttribute('id')).toLowerCase();
-             if (element === activeElement){
-                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
-             } else {
-                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
-             }
-         })
-     }, false);
-
-    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
-    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
-    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
-
-    function checkTocPosition() {
-        const width = document.body.scrollWidth;
-
-        if (width - main - (toc * 2) - (gap * 4) > 0) {
-            document.getElementById("toc-container").classList.add("wide");
-        } else {
-            document.getElementById("toc-container").classList.remove("wide");
         }
-    }
 
-    function getOffsetTop(element) {
-        if (!element.getClientRects().length) {
-            return 0;
+        function getOffsetTop(element) {
+            if (!element.getClientRects().length) {
+                return 0;
+            }
+            let rect = element.getBoundingClientRect();
+            let win = element.ownerDocument.defaultView;
+            return rect.top + win.pageYOffset;
         }
-        let rect = element.getBoundingClientRect();
-        let win = element.ownerDocument.defaultView;
-        return rect.top + win.pageYOffset;   
-    }
-</script>
+    </script>
   <div class="post-content"><p>总结到chapter0到chapter2中的重要内容。</p>
 <h3 id="内核初始化过程">内核初始化过程<a hidden class="anchor" aria-hidden="true" href="#内核初始化过程">#</a></h3>
 <h4 id="相关文件">相关文件<a hidden class="anchor" aria-hidden="true" href="#相关文件">#</a></h4>
