@@ -370,12 +370,12 @@ man</p>
 
         const copybutton = document.createElement('button');
         copybutton.classList.add('copy-code');
-        copybutton.innerHTML = '🗍复制';
+        copybutton.innerHTML = '❐复制';
 
         function copyingDone() {
-            copybutton.innerHTML = '✔复制';
+            copybutton.innerHTML = '🗹复制';
             setTimeout(() => {
-                copybutton.innerHTML = '🗍复制';
+                copybutton.innerHTML = '❐复制';
             }, 2000);
         }
 
