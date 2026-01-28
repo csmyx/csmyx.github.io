@@ -368,10 +368,61 @@
 </span></span></code></pre></td></tr></table>
 </div>
 </div><p>明明是一次正常的clone代码操作，突然提示我输入密码，给我搞蒙了，我寻思我不是ssh方式clone的吗，为啥还要输入密码，关键我也没设置过哇。然后我又拿我自己的另一个仓库试了试，如下图所示，还是一样：</p>
-<img src="/img/网络问题/note1/1.png#center" style="zoom:67%;" />
+<!-- <img src="/img/网络问题/note1/1.png#center" style="zoom:67%;" /> -->
+<p><p>
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    <a data-fancybox="gallery" data-src="/posts/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/note1/1.png" data-caption="tmp">
+        <picture>
+            <source type="image/webp" srcset="/posts/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/note1/1_hu_c16d13d9183c893e.webp">
+            <img src="/posts/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/note1/1.png" alt="tmp"  loading="lazy"
+                width="1393px" height="249px"
+                style="width: 100%; max-height: 36rem; height: auto;" />
+        </picture>
+    </a>
+    
+    
+    
+</p></p>
 <p>为啥会提示输入密码呢，我查了一下，发现其实github ssh方式是可以在非对称加密之外，再额外配置一个密码，，其作用就是在私钥泄露之后还有一道防线。当然这个是可选项，也可以选择不配置。</p>
 <p>具体用法是，当你生成ssh密钥时，会提示是否设置密码，但是这里一般都是回车跳过选择不配置，所以我对这个没啥印象。。</p>
-<img src="/img/网络问题/note1/2.png#center" style="zoom:67%;" />
+<p><p>
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    <a data-fancybox="gallery" data-src="/posts/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/note1/2.png" data-caption="未命名图片">
+        <picture>
+            <source type="image/webp" srcset="/posts/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/note1/2_hu_f759ae42f249cc1a.webp">
+            <img src="/posts/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/note1/2.png" alt="未命名图片"  loading="lazy"
+                width="1295px" height="644px"
+                style="width: 100%; max-height: 36rem; height: auto;" />
+        </picture>
+    </a>
+    
+    
+    
+</p></p>
 <p>那么问题来了，既然我都没配置密码，为啥还会提示我输入密码？显然这时无论我输入什么都没用。接下来就是实际排查过程了</p>
 <h3 id="排查过程">排查过程<a hidden class="anchor" aria-hidden="true" href="#排查过程">#</a></h3>
 <p>利用<code>ssh -vT git@github.com</code>，加上<code>-v</code>参数查看调试信息：</p>
@@ -623,7 +674,32 @@
 </span></span></code></pre></td></tr></table>
 </div>
 </div><p>这也是wsl镜像模式自动配置的，namerserver的ip其实就是宿主机的ip，就是说域名解析是跟宿主机一样的。</p>
-<img src="/img/网络问题/note1/3.png#center" style="zoom:67%;" />
+<p><p>
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    <a data-fancybox="gallery" data-src="/posts/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/note1/3.png" data-caption="未命名图片">
+        <picture>
+            <source type="image/webp" srcset="/posts/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/note1/3_hu_79765df738273c56.webp">
+            <img src="/posts/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/note1/3.png" alt="未命名图片"  loading="lazy"
+                width="702px" height="291px"
+                style="width: 100%; max-height: 36rem; height: auto;" />
+        </picture>
+    </a>
+    
+    
+    
+</p></p>
 <p>诡异的地方来了，为啥域名解析结果是127.0.0.1?</p>
 <p>白丝不得其解时，我发现，我的windows宿主机里的<code>C:\Users\xxx\.ssh\config</code>配置了这个：</p>
 <div class="highlight"><div class="chroma">
@@ -654,7 +730,32 @@
 <p>这个配置应该是我之前在windows上clone代码时发现没走代理配置的，应该是随便参考的类似<a href="https://www.v2ex.com/t/841032">这样的文章</a>，好像是为了在windows上<a href="https://www.cnblogs.com/kaiye/p/9260367.html">绕过 ssh 防火墙限制 </a>。我不太清楚这个配置现在是否还有作用，但是这个就是问题根源，我也懒得改了，先不管windows了，至于这为啥会导致fingerprint发生变化，我也不太清楚。累了，先解决问题吧。</p>
 <p>我的方案是，修改wsl的域名解析不走宿主机，这样也不用改宿主机的里的<code>~/.ssh\config</code>文件。测试了一下将wsl里的域名服务器改成不用自动生成的宿主机的ip，而是用<code>114.114.114.114</code>，域名解析也正常了，然后github公钥认证问题也没有了。</p>
 <p>下图所示，对比使用宿主机和<code>114.114.114.114</code>两者域名解析的结果：</p>
-<img src="/img/网络问题/note1/4.png#center" style="zoom:67%;" />
+<p><p>
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    <a data-fancybox="gallery" data-src="/posts/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/note1/4.png" data-caption="未命名图片">
+        <picture>
+            <source type="image/webp" srcset="/posts/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/note1/4_hu_d63e564e61c753ef.webp">
+            <img src="/posts/%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/note1/4.png" alt="未命名图片"  loading="lazy"
+                width="565px" height="544px"
+                style="width: 100%; max-height: 36rem; height: auto;" />
+        </picture>
+    </a>
+    
+    
+    
+</p></p>
 <p>所以修改方案就是不要让wsl帮我们配置域名，而是我们自己配置。</p>
 <h4 id="修改方案">修改方案<a hidden class="anchor" aria-hidden="true" href="#修改方案">#</a></h4>
 <p>按上文所示，手动配置DNS，在<code>/etc/resolv.conf</code>设置</p>
